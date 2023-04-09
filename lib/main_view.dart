@@ -1,3 +1,4 @@
+import 'package:babaari/dashboard/add_person_view.dart';
 import 'package:babaari/dashboard_view.dart';
 import 'package:babaari/history_view.dart';
 import 'package:babaari/people_view.dart';
@@ -10,6 +11,7 @@ class MainView extends ConsumerWidget {
   final _sideMenuController = SideMenuController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    return Scaffold(appBar: AppBar(), body: const AddPersonView());
     return Scaffold(
         appBar: AppBar(),
         body: Row(

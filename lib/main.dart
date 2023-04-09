@@ -1,17 +1,24 @@
 import 'dart:io';
 
+import 'package:babaari/helpers/database.dart';
 import 'package:babaari/main_view.dart';
 import 'package:docx_template/docx_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:get_it/get_it.dart';
+import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-void main() {
+import 'models/adhocstaff.dart';
+
+void main() async {
+  GetIt.I.registerSingleton<Isar>(await Isar.open([AddHocStaffSchema]));
+  GetIt.I.registerSingleton<DatabaseHelper>(DatabaseHelper());
   runApp(ProviderScope(child: MyApp()));
 }
 

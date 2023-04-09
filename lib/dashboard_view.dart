@@ -2,6 +2,8 @@ import 'package:babaari/template_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'dashboard/add_person_view.dart';
+import 'dashboard/dashboard_providers.dart';
 import 'department_summary.dart';
 import 'recent_actions.dart';
 
@@ -9,7 +11,7 @@ class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // return AddPersonView();
+    return const AddPersonView();
     return Stack(
       children: [
         Positioned(
@@ -69,7 +71,7 @@ class _StatisticsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: const DepartmentSummary());
+        child: DepartmentSummary());
   }
 }
 
@@ -77,6 +79,14 @@ class _ButtonsView extends ConsumerWidget {
   const _ButtonsView();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    String numberofCorpers = ref.watch(numberOfCorpers).when(
+        data: (data) => data != null ? data.toString() : 'none',
+        error: (er, st) => 'ERROR',
+        loading: () => '....');
+    String numberofsiwes = ref.watch(numberOfSiwes).when(
+        data: (data) => data != null ? data.toString() : 'none',
+        error: (er, st) => 'ERROR',
+        loading: () => '...');
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child:
@@ -116,7 +126,7 @@ class _ButtonsView extends ConsumerWidget {
               bgcolor: Colors.green.shade200,
               line1: 'Number of',
               line2: 'NYSC',
-              txt: '250',
+              txt: numberofCorpers,
             ),
           )),
           Expanded(
@@ -126,7 +136,7 @@ class _ButtonsView extends ConsumerWidget {
               bgcolor: Colors.blue.shade200,
               line1: 'Number of',
               line2: 'SIWES',
-              txt: '250',
+              txt: numberofsiwes,
             ),
           ))
         ]));
