@@ -11,7 +11,6 @@ class AddHocStaff {
   String? lastname;
   DateTime? startDate;
   DateTime? endDate;
-  String? stateCode;
   String? department;
   String? unit;
   String? phoneNumber;
@@ -22,7 +21,7 @@ class AddHocStaff {
   String? nokAddress;
   String? houseAddress;
   String? staffID;
-  String? schoolID;
+  String? institutionID;
   DateTime? registeredDate;
   String? bankName;
   String? accountNumber;

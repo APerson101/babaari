@@ -149,6 +149,6 @@ class _DailyActivityView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: RecentActionsView());
+        child: const RecentActionsView());
   }
 }

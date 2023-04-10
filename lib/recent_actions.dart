@@ -1,48 +1,57 @@
+import 'package:babaari/activity/activity_providers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:timeline_tile/timeline_tile.dart';
 
-import 'activity_model.dart';
+import 'models/activity.dart';
 
 class RecentActionsView extends ConsumerWidget {
-  RecentActionsView({super.key});
-  final List<ActivityModel> allActivity = List.generate(
-      10,
-      (index) => ActivityModel(
-          type: 'Addition',
-          text:
-              'Student with ID 50 was added successfully, name: Mubarak Kwankwaso',
-          time: DateTime.now()));
+  const RecentActionsView({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(todayActivities);
+    final allActivity = ref.watch(todayActivities);
     return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomLeft,
-          colors: [
-            Color(0xFFDB84B1),
-            Color(0xFF3A3E88),
-          ],
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomLeft,
+            colors: [
+              Color(0xFFDB84B1),
+              Color(0xFF3A3E88),
+            ],
+          ),
         ),
-      ),
-      child: ListView.builder(
-          itemCount: allActivity.length,
-          itemBuilder: (context, index) {
-            return _buildTimelineTile(
-                indicator:
-                    const _IconIndicator(iconData: Icons.sunny, size: 20),
-                model: allActivity[index],
-                isLast: allActivity[index] == allActivity.last);
-          }),
-    );
+        child: allActivity.when(
+            data: (activities) {
+              if (activities == null) {
+                return const Center(
+                  child: Text("No activity today yet"),
+                );
+              }
+              return ListView.builder(
+                  itemCount: activities.length,
+                  itemBuilder: (context, index) {
+                    return _buildTimelineTile(
+                        indicator: const _IconIndicator(
+                            iconData: Icons.sunny, size: 20),
+                        model: activities[index],
+                        isLast: activities[index] == activities.last);
+                  });
+            },
+            error: (er, st) => const Center(child: Text("Failed to load")),
+            loading: () => const Center(
+                  child: CircularProgressIndicator.adaptive(),
+                )));
   }
 
   TimelineTile _buildTimelineTile({
     required _IconIndicator indicator,
-    required ActivityModel model,
+    required Activity model,
     bool isLast = false,
   }) {
     return TimelineTile(
@@ -61,7 +70,7 @@ class RecentActionsView extends ConsumerWidget {
         child: Container(
           alignment: const Alignment(0.0, -0.50),
           child: Text(
-            '${model.time.hour.toString()} : ${model.time.minute}',
+            '${model.created!.hour.toString()} : ${model.created!.minute}',
             style: GoogleFonts.lato(
               fontSize: 18,
               color: Colors.white.withOpacity(0.6),
@@ -77,7 +86,7 @@ class RecentActionsView extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              model.type,
+              describeEnum(model.type),
               style: GoogleFonts.lato(
                 fontSize: 18,
                 color: Colors.white.withOpacity(0.8),
@@ -86,7 +95,7 @@ class RecentActionsView extends ConsumerWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              model.text,
+              model.message!,
               style: GoogleFonts.lato(
                 fontSize: 14,
                 color: Colors.white.withOpacity(0.6),

@@ -14,10 +14,12 @@ import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import 'models/activity.dart';
 import 'models/adhocstaff.dart';
 
 void main() async {
-  GetIt.I.registerSingleton<Isar>(await Isar.open([AddHocStaffSchema]));
+  GetIt.I.registerSingleton<Isar>(
+      await Isar.open([AddHocStaffSchema, ActivitySchema]));
   GetIt.I.registerSingleton<DatabaseHelper>(DatabaseHelper());
   runApp(ProviderScope(child: MyApp()));
 }

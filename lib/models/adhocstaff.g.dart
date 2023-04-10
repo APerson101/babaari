@@ -57,45 +57,45 @@ const AddHocStaffSchema = CollectionSchema(
       name: r'houseAddress',
       type: IsarType.string,
     ),
-    r'institutionName': PropertySchema(
+    r'institutionID': PropertySchema(
       id: 8,
+      name: r'institutionID',
+      type: IsarType.string,
+    ),
+    r'institutionName': PropertySchema(
+      id: 9,
       name: r'institutionName',
       type: IsarType.string,
     ),
     r'lastname': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'lastname',
       type: IsarType.string,
     ),
     r'nokAddress': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'nokAddress',
       type: IsarType.string,
     ),
     r'nokName': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'nokName',
       type: IsarType.string,
     ),
     r'nokNumber': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'nokNumber',
       type: IsarType.string,
     ),
     r'phoneNumber': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'phoneNumber',
       type: IsarType.string,
     ),
     r'registeredDate': PropertySchema(
-      id: 14,
+      id: 15,
       name: r'registeredDate',
       type: IsarType.dateTime,
-    ),
-    r'schoolID': PropertySchema(
-      id: 15,
-      name: r'schoolID',
-      type: IsarType.string,
     ),
     r'staffID': PropertySchema(
       id: 16,
@@ -113,13 +113,8 @@ const AddHocStaffSchema = CollectionSchema(
       name: r'startDate',
       type: IsarType.dateTime,
     ),
-    r'stateCode': PropertySchema(
-      id: 19,
-      name: r'stateCode',
-      type: IsarType.string,
-    ),
     r'unit': PropertySchema(
-      id: 20,
+      id: 19,
       name: r'unit',
       type: IsarType.string,
     )
@@ -187,6 +182,12 @@ int _addHocStaffEstimateSize(
     }
   }
   {
+    final value = object.institutionID;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.institutionName;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -223,24 +224,12 @@ int _addHocStaffEstimateSize(
     }
   }
   {
-    final value = object.schoolID;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
-  {
     final value = object.staffID;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
     }
   }
   bytesCount += 3 + object.staffType.name.length * 3;
-  {
-    final value = object.stateCode;
-    if (value != null) {
-      bytesCount += 3 + value.length * 3;
-    }
-  }
   {
     final value = object.unit;
     if (value != null) {
@@ -264,19 +253,18 @@ void _addHocStaffSerialize(
   writer.writeDateTime(offsets[5], object.endDate);
   writer.writeString(offsets[6], object.firstname);
   writer.writeString(offsets[7], object.houseAddress);
-  writer.writeString(offsets[8], object.institutionName);
-  writer.writeString(offsets[9], object.lastname);
-  writer.writeString(offsets[10], object.nokAddress);
-  writer.writeString(offsets[11], object.nokName);
-  writer.writeString(offsets[12], object.nokNumber);
-  writer.writeString(offsets[13], object.phoneNumber);
-  writer.writeDateTime(offsets[14], object.registeredDate);
-  writer.writeString(offsets[15], object.schoolID);
+  writer.writeString(offsets[8], object.institutionID);
+  writer.writeString(offsets[9], object.institutionName);
+  writer.writeString(offsets[10], object.lastname);
+  writer.writeString(offsets[11], object.nokAddress);
+  writer.writeString(offsets[12], object.nokName);
+  writer.writeString(offsets[13], object.nokNumber);
+  writer.writeString(offsets[14], object.phoneNumber);
+  writer.writeDateTime(offsets[15], object.registeredDate);
   writer.writeString(offsets[16], object.staffID);
   writer.writeString(offsets[17], object.staffType.name);
   writer.writeDateTime(offsets[18], object.startDate);
-  writer.writeString(offsets[19], object.stateCode);
-  writer.writeString(offsets[20], object.unit);
+  writer.writeString(offsets[19], object.unit);
 }
 
 AddHocStaff _addHocStaffDeserialize(
@@ -295,21 +283,20 @@ AddHocStaff _addHocStaffDeserialize(
   object.firstname = reader.readStringOrNull(offsets[6]);
   object.houseAddress = reader.readStringOrNull(offsets[7]);
   object.id = id;
-  object.institutionName = reader.readStringOrNull(offsets[8]);
-  object.lastname = reader.readStringOrNull(offsets[9]);
-  object.nokAddress = reader.readStringOrNull(offsets[10]);
-  object.nokName = reader.readStringOrNull(offsets[11]);
-  object.nokNumber = reader.readStringOrNull(offsets[12]);
-  object.phoneNumber = reader.readStringOrNull(offsets[13]);
-  object.registeredDate = reader.readDateTimeOrNull(offsets[14]);
-  object.schoolID = reader.readStringOrNull(offsets[15]);
+  object.institutionID = reader.readStringOrNull(offsets[8]);
+  object.institutionName = reader.readStringOrNull(offsets[9]);
+  object.lastname = reader.readStringOrNull(offsets[10]);
+  object.nokAddress = reader.readStringOrNull(offsets[11]);
+  object.nokName = reader.readStringOrNull(offsets[12]);
+  object.nokNumber = reader.readStringOrNull(offsets[13]);
+  object.phoneNumber = reader.readStringOrNull(offsets[14]);
+  object.registeredDate = reader.readDateTimeOrNull(offsets[15]);
   object.staffID = reader.readStringOrNull(offsets[16]);
   object.staffType =
       _AddHocStaffstaffTypeValueEnumMap[reader.readStringOrNull(offsets[17])] ??
           AddHocStaffType.siwes;
   object.startDate = reader.readDateTimeOrNull(offsets[18]);
-  object.stateCode = reader.readStringOrNull(offsets[19]);
-  object.unit = reader.readStringOrNull(offsets[20]);
+  object.unit = reader.readStringOrNull(offsets[19]);
   return object;
 }
 
@@ -349,9 +336,9 @@ P _addHocStaffDeserializeProp<P>(
     case 13:
       return (reader.readStringOrNull(offset)) as P;
     case 14:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 15:
       return (reader.readStringOrNull(offset)) as P;
+    case 15:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 16:
       return (reader.readStringOrNull(offset)) as P;
     case 17:
@@ -361,8 +348,6 @@ P _addHocStaffDeserializeProp<P>(
     case 18:
       return (reader.readDateTimeOrNull(offset)) as P;
     case 19:
-      return (reader.readStringOrNull(offset)) as P;
-    case 20:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -1674,6 +1659,160 @@ extension AddHocStaffQueryFilter
   }
 
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'institutionID',
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'institutionID',
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'institutionID',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'institutionID',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDMatches(String pattern, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'institutionID',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'institutionID',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
+      institutionIDIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'institutionID',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
       institutionNameIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -2669,159 +2808,6 @@ extension AddHocStaffQueryFilter
   }
 
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'schoolID',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'schoolID',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition> schoolIDEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDLessThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition> schoolIDBetween(
-    String? lower,
-    String? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'schoolID',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'schoolID',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition> schoolIDMatches(
-      String pattern,
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'schoolID',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'schoolID',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      schoolIDIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'schoolID',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
       staffIDIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -3183,160 +3169,6 @@ extension AddHocStaffQueryFilter
     });
   }
 
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeIsNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNull(
-        property: r'stateCode',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeIsNotNull() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(const FilterCondition.isNotNull(
-        property: r'stateCode',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeEqualTo(
-    String? value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeGreaterThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        include: include,
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeLessThan(
-    String? value, {
-    bool include = false,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.lessThan(
-        include: include,
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeBetween(
-    String? lower,
-    String? upper, {
-    bool includeLower = true,
-    bool includeUpper = true,
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.between(
-        property: r'stateCode',
-        lower: lower,
-        includeLower: includeLower,
-        upper: upper,
-        includeUpper: includeUpper,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeStartsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.startsWith(
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeEndsWith(
-    String value, {
-    bool caseSensitive = true,
-  }) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.endsWith(
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeContains(String value, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.contains(
-        property: r'stateCode',
-        value: value,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeMatches(String pattern, {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.matches(
-        property: r'stateCode',
-        wildcard: pattern,
-        caseSensitive: caseSensitive,
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeIsEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.equalTo(
-        property: r'stateCode',
-        value: '',
-      ));
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition>
-      stateCodeIsNotEmpty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addFilterCondition(FilterCondition.greaterThan(
-        property: r'stateCode',
-        value: '',
-      ));
-    });
-  }
-
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterFilterCondition> unitIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -3593,6 +3425,19 @@ extension AddHocStaffQuerySortBy
     });
   }
 
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByInstitutionID() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'institutionID', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy>
+      sortByInstitutionIDDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'institutionID', Sort.desc);
+    });
+  }
+
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByInstitutionName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'institutionName', Sort.asc);
@@ -3679,18 +3524,6 @@ extension AddHocStaffQuerySortBy
     });
   }
 
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortBySchoolID() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'schoolID', Sort.asc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortBySchoolIDDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'schoolID', Sort.desc);
-    });
-  }
-
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByStaffID() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'staffID', Sort.asc);
@@ -3724,18 +3557,6 @@ extension AddHocStaffQuerySortBy
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByStartDateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'startDate', Sort.desc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByStateCode() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stateCode', Sort.asc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> sortByStateCodeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stateCode', Sort.desc);
     });
   }
 
@@ -3865,6 +3686,19 @@ extension AddHocStaffQuerySortThenBy
     });
   }
 
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByInstitutionID() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'institutionID', Sort.asc);
+    });
+  }
+
+  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy>
+      thenByInstitutionIDDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'institutionID', Sort.desc);
+    });
+  }
+
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByInstitutionName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'institutionName', Sort.asc);
@@ -3951,18 +3785,6 @@ extension AddHocStaffQuerySortThenBy
     });
   }
 
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenBySchoolID() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'schoolID', Sort.asc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenBySchoolIDDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'schoolID', Sort.desc);
-    });
-  }
-
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByStaffID() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'staffID', Sort.asc);
@@ -3996,18 +3818,6 @@ extension AddHocStaffQuerySortThenBy
   QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByStartDateDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'startDate', Sort.desc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByStateCode() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stateCode', Sort.asc);
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QAfterSortBy> thenByStateCodeDesc() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addSortBy(r'stateCode', Sort.desc);
     });
   }
 
@@ -4083,6 +3893,14 @@ extension AddHocStaffQueryWhereDistinct
     });
   }
 
+  QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctByInstitutionID(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'institutionID',
+          caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctByInstitutionName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -4132,13 +3950,6 @@ extension AddHocStaffQueryWhereDistinct
     });
   }
 
-  QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctBySchoolID(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'schoolID', caseSensitive: caseSensitive);
-    });
-  }
-
   QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctByStaffID(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -4156,13 +3967,6 @@ extension AddHocStaffQueryWhereDistinct
   QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctByStartDate() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'startDate');
-    });
-  }
-
-  QueryBuilder<AddHocStaff, AddHocStaff, QDistinct> distinctByStateCode(
-      {bool caseSensitive = true}) {
-    return QueryBuilder.apply(this, (query) {
-      return query.addDistinctBy(r'stateCode', caseSensitive: caseSensitive);
     });
   }
 
@@ -4230,6 +4034,12 @@ extension AddHocStaffQueryProperty
     });
   }
 
+  QueryBuilder<AddHocStaff, String?, QQueryOperations> institutionIDProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'institutionID');
+    });
+  }
+
   QueryBuilder<AddHocStaff, String?, QQueryOperations>
       institutionNameProperty() {
     return QueryBuilder.apply(this, (query) {
@@ -4274,12 +4084,6 @@ extension AddHocStaffQueryProperty
     });
   }
 
-  QueryBuilder<AddHocStaff, String?, QQueryOperations> schoolIDProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'schoolID');
-    });
-  }
-
   QueryBuilder<AddHocStaff, String?, QQueryOperations> staffIDProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'staffID');
@@ -4296,12 +4100,6 @@ extension AddHocStaffQueryProperty
   QueryBuilder<AddHocStaff, DateTime?, QQueryOperations> startDateProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'startDate');
-    });
-  }
-
-  QueryBuilder<AddHocStaff, String?, QQueryOperations> stateCodeProperty() {
-    return QueryBuilder.apply(this, (query) {
-      return query.addPropertyName(r'stateCode');
     });
   }
 
