@@ -1,9 +1,12 @@
 import 'package:babaari/helpers/database.dart';
+import 'package:babaari/models/activity.dart';
 import 'package:babaari/models/adhocstaff.dart';
 import 'package:babaari/models/department.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
+
+import '../widgets/add_view.dart';
 
 final newPersonAdded = StreamProvider.autoDispose((ref) async* {
   var isar = GetIt.I<Isar>();
@@ -21,14 +24,6 @@ final newPersonAdded = StreamProvider.autoDispose((ref) async* {
   });
 });
 
-final newUnitAdded = AutoDisposeStreamProvider((ref) async* {
-  var isar = GetIt.I<Isar>();
-  var updatedUnits = isar.units.watchLazy();
-
-  updatedUnits.listen((_) {
-    ref.invalidate(allUnits);
-  });
-});
 final newDepartmentAdded = AutoDisposeStreamProvider((ref) async* {
   var isar = GetIt.I<Isar>();
   var updatedDpts = isar.departments.watchLazy();
@@ -62,7 +57,30 @@ final allDepartments = AutoDisposeFutureProvider((ref) async {
   var isar = GetIt.I<Isar>();
   return await isar.departments.where().findAll();
 });
-final allUnits = AutoDisposeFutureProvider((ref) async {
+
+final deleteStaff =
+    FutureProvider.autoDispose.family<void, Id>((ref, id) async {
+  var isar = GetIt.I<DatabaseHelper>();
+  await isar.deleteStaff(id);
+});
+
+final updateDpt =
+    StateProvider.autoDispose.family<dynamic, Department>((ref, dpt) async {
+  var isar = GetIt.I<DatabaseHelper>();
+  var lt = await isar.updateDepartment(dpt);
+  ref.invalidate(allDepartments);
+  return lt;
+});
+
+final deleteDpt = StateProvider((ref) async {
+  var isar = GetIt.I<DatabaseHelper>();
+  var status = await isar.deleteDepartment(ref.watch(idToDelete));
+  ref.invalidate(allDepartments);
+  return status;
+});
+
+final getStaffActivity =
+    FutureProvider.autoDispose.family<List<Activity>, String>((ref, id) async {
   var isar = GetIt.I<Isar>();
-  return await isar.units.where().findAll();
+  return await isar.activitys.filter().staffIDEqualTo(id).findAll();
 });

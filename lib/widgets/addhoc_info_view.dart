@@ -1,4 +1,5 @@
 import 'package:babaari/models/adhocstaff.dart';
+import 'package:babaari/widgets/staff_activity.dart';
 import 'package:babaari/widgets/view_providers.dart';
 import 'package:babaari/widgets/widgets.dart';
 import 'package:flutter/material.dart';
@@ -19,9 +20,7 @@ class AddHocInfoView extends ConsumerWidget {
         centerTitle: true,
         leading: BackButton(
           onPressed: () {
-            Navigator.of(context)
-              ..pop()
-              ..pop();
+            Navigator.of(context).pop();
           },
         ),
         title: Text('${staff.firstname} ${staff.lastname}'),
@@ -109,10 +108,8 @@ class _StaffInfo extends ConsumerWidget {
             key: _key,
             child: Column(children: [
               Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    // first name
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(children: [
                     Expanded(
                       child: EditableLabel(
                         label: labels[0],
@@ -124,18 +121,14 @@ class _StaffInfo extends ConsumerWidget {
                     const SizedBox(
                       width: 20,
                     ),
-                    // last name
                     Expanded(
-                      child: EditableLabel(
-                        label: labels[1],
-                        data: staff.lastname!,
-                        isEditing: editing,
-                        controller: _controllers[1]..text = staff.lastname!,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                        child: EditableLabel(
+                      label: labels[1],
+                      data: staff.lastname!,
+                      isEditing: editing,
+                      controller: _controllers[1]..text = staff.lastname!,
+                    ))
+                  ])),
               EditableLabel(
                 label: labels[2],
                 data: staff.phoneNumber!,
@@ -319,7 +312,15 @@ class _StaffInfo extends ConsumerWidget {
                   label: labels[17],
                   data: ref.watch(nokNumberViewProvider(staff)),
                   isEditing: editing,
-                  controller: _controllers[17]..text = staff.nokNumber ?? '-')
+                  controller: _controllers[17]..text = staff.nokNumber ?? '-'),
+              Row(
+                children: [
+                  const Expanded(child: Divider()),
+                  Text("${staff.firstname}'s activity"),
+                  const Expanded(child: Divider()),
+                ],
+              ),
+              StaffActivity(staffID: staff.staffID!)
             ]),
           ),
         ),

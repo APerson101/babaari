@@ -17,7 +17,6 @@ enum ActivityType {
   update,
   delete,
   printmonthlyclearance,
-  printsiwesacceptance,
+  printAcceptanceLetter,
   printfinalclearance,
-  printnyscacceptance
 }

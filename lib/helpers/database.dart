@@ -8,6 +8,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../models/activity.dart';
 import '../models/adhocstaff.dart';
+import '../models/department.dart';
 
 class DatabaseHelper {
   Isar isar;
@@ -15,7 +16,7 @@ class DatabaseHelper {
   DatabaseHelper() : isar = GetIt.I<Isar>();
 
   updateStaff(AddHocStaff person) async {
-    isar.writeTxn(() async {
+    await isar.writeTxn(() async {
       await isar.addHocStaffs.put(person);
     });
     await _saveNamesCSV([person]);
@@ -41,16 +42,16 @@ class DatabaseHelper {
   }
 
   _saveStaff(List<AddHocStaff> staff) async {
-    isar.writeTxn(() async {
-      isar.addHocStaffs.putAll(staff);
+    await isar.writeTxn(() async {
+      await isar.addHocStaffs.putAll(staff);
     });
     _saveNamesCSV(staff);
     return true;
   }
 
   saveActivity(List<Activity> activities) async {
-    isar.writeTxn(() async {
-      isar.activitys.putAll(activities);
+    await isar.writeTxn(() async {
+      await isar.activitys.putAll(activities);
     });
   }
 
@@ -82,8 +83,20 @@ class DatabaseHelper {
   }
 
   clearStaff() async {
-    isar.writeTxn(() async {
+    await isar.writeTxn(() async {
       await isar.addHocStaffs.clear();
+    });
+  }
+
+  deleteStaff(Id id) async {
+    return await isar.writeTxn(() async {
+      return await isar.addHocStaffs.delete(id);
+    });
+  }
+
+  updateDepartment(Department dpt) async {
+    return await isar.writeTxn(() async {
+      return await isar.departments.put(dpt);
     });
   }
 
@@ -105,6 +118,14 @@ class DatabaseHelper {
   clearSuggestions() async {
     (await File('${(await getApplicationDocumentsDirectory()).path}/names.txt')
         .delete());
+  }
+
+  Future<bool> deleteDepartment(Id dpt) async {
+    debugPrint('deleting $dpt');
+    return await isar.writeTxn(() async {
+      var status = await isar.departments.delete(dpt);
+      return status;
+    });
   }
 }
 

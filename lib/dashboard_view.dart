@@ -2,7 +2,6 @@ import 'package:babaari/template_widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'dashboard/add_person_view.dart';
 import 'dashboard/dashboard_providers.dart';
 import 'department_summary.dart';
 import 'recent_actions.dart';
@@ -11,7 +10,7 @@ class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return const AddPersonView();
+    // return const AddPersonView();
     return Stack(
       children: [
         Positioned(
@@ -97,12 +96,12 @@ class _ButtonsView extends ConsumerWidget {
                   child: ButtonTemplate(
                       icon: const Icon(
                         Icons.add,
-                        size: 36,
+                        size: 20,
                       ),
                       backgroundcolor: Colors.purple.shade200,
                       iconcolor: Colors.purple.shade300,
                       line1: 'Add',
-                      line2: 'New Person',
+                      line2: 'Person',
                       onTap: () {}))),
           Expanded(
               child: Padding(
@@ -112,7 +111,7 @@ class _ButtonsView extends ConsumerWidget {
                 iconcolor: Colors.red.shade300,
                 icon: const Icon(
                   Icons.remove,
-                  size: 36,
+                  size: 20,
                 ),
                 line1: 'Remove',
                 line2: 'Existing',
@@ -124,8 +123,8 @@ class _ButtonsView extends ConsumerWidget {
             padding: const EdgeInsets.all(8.0),
             child: DataTemplate(
               bgcolor: Colors.green.shade200,
-              line1: 'Number of',
-              line2: 'NYSC',
+              line1: 'NYSC',
+              line2: 'Number',
               txt: numberofCorpers,
             ),
           )),
@@ -134,8 +133,8 @@ class _ButtonsView extends ConsumerWidget {
             padding: const EdgeInsets.all(8.0),
             child: DataTemplate(
               bgcolor: Colors.blue.shade200,
-              line1: 'Number of',
-              line2: 'SIWES',
+              line1: 'SIWES',
+              line2: 'Number',
               txt: numberofsiwes,
             ),
           ))

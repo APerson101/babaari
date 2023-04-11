@@ -16,10 +16,11 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'models/activity.dart';
 import 'models/adhocstaff.dart';
+import 'models/department.dart';
 
 void main() async {
   GetIt.I.registerSingleton<Isar>(
-      await Isar.open([AddHocStaffSchema, ActivitySchema]));
+      await Isar.open([AddHocStaffSchema, ActivitySchema, DepartmentSchema]));
   GetIt.I.registerSingleton<DatabaseHelper>(DatabaseHelper());
   runApp(ProviderScope(child: MyApp()));
 }

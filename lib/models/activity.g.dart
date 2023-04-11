@@ -130,18 +130,16 @@ const _ActivitytypeEnumValueMap = {
   r'update': r'update',
   r'delete': r'delete',
   r'printmonthlyclearance': r'printmonthlyclearance',
-  r'printsiwesacceptance': r'printsiwesacceptance',
+  r'printAcceptanceLetter': r'printAcceptanceLetter',
   r'printfinalclearance': r'printfinalclearance',
-  r'printnyscacceptance': r'printnyscacceptance',
 };
 const _ActivitytypeValueEnumMap = {
   r'create': ActivityType.create,
   r'update': ActivityType.update,
   r'delete': ActivityType.delete,
   r'printmonthlyclearance': ActivityType.printmonthlyclearance,
-  r'printsiwesacceptance': ActivityType.printsiwesacceptance,
+  r'printAcceptanceLetter': ActivityType.printAcceptanceLetter,
   r'printfinalclearance': ActivityType.printfinalclearance,
-  r'printnyscacceptance': ActivityType.printnyscacceptance,
 };
 
 Id _activityGetId(Activity object) {

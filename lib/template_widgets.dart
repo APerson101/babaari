@@ -63,7 +63,7 @@ class DataTemplate extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return DecoratedBox(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20), color: bgcolor),
+          borderRadius: BorderRadius.circular(18), color: bgcolor),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
@@ -72,18 +72,18 @@ class DataTemplate extends ConsumerWidget {
             child: Text(line1,
                 textAlign: TextAlign.center,
                 style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           Text(line2,
               textAlign: TextAlign.center,
               style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           Padding(
               padding: const EdgeInsets.all(4.0),
               child: Text(
                 txt,
                 style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               )),
         ],
       ),
