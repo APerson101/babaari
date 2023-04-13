@@ -1,6 +1,7 @@
 import 'package:babaari/helpers/database.dart';
 import 'package:babaari/widgets/search_result.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
@@ -74,12 +75,12 @@ final _isTyping = StateProvider((ref) => false);
 class EditableLabel extends ConsumerWidget {
   EditableLabel(
       {super.key,
+      this.data,
       required this.isEditing,
       required this.controller,
-      required this.data,
       required this.label});
   bool isEditing;
-  String data;
+  String? data;
   String label;
   final TextEditingController controller;
   @override
@@ -105,9 +106,27 @@ class EditableLabel extends ConsumerWidget {
       return Row(
         children: [
           Text('$label: '),
-          Text(data),
+          Text(data ?? ""),
         ],
       );
+    }
+  }
+}
+
+class StateCodeFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    debugPrint(oldValue.text);
+    debugPrint(newValue.text);
+    if (oldValue.text.isEmpty) {
+      return TextEditingValue(
+          text: 'FC/${newValue.text}',
+          selection: TextSelection.collapsed(offset: newValue.text.length - 1));
+    } else {
+      return TextEditingValue(
+          text: 'FC/${oldValue.text}',
+          selection: TextSelection.collapsed(offset: oldValue.text.length - 1));
     }
   }
 }

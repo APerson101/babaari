@@ -31,6 +31,7 @@ dependencies:
   isar: ^3.0.5
   intl: ^0.18.0
   csv: ^5.0.1
+  gap: ^2.0.1
 dependency_overrides:
   archive: 3.3.0
 dev_dependencies:

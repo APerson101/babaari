@@ -19,4 +19,6 @@ enum ActivityType {
   printmonthlyclearance,
   printAcceptanceLetter,
   printfinalclearance,
+  siwesCompletion,
+  departmentPosting
 }

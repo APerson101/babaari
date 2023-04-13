@@ -3,20 +3,17 @@ import 'package:babaari/helpers/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'models/adhocstaff.dart';
 import 'models/department.dart';
+import 'widgets/dpt_into.dart';
 
 class DepartmentSummary extends ConsumerWidget {
-  DepartmentSummary({super.key});
-  final Map<String, int> corpersList = {};
-  final Map<String, int> siwesList = {};
+  const DepartmentSummary({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final allDpts = ref.watch(allDepartments);
 
     return ref.watch(allAdhocStaff).when(
           data: (data) {
-            sortedList(data);
             return allDpts.when(
                 error: (Object error, StackTrace stackTrace) =>
                     const Center(child: Text("Error loading")),
@@ -28,6 +25,15 @@ class DepartmentSummary extends ConsumerWidget {
                         ...departments.map((department) => Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: ListTile(
+                                onTap: () async {
+                                  // show more info about department in terms of units
+                                  Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) {
+                                    return DPTinfoView(
+                                      departmentName: department.name!,
+                                    );
+                                  }));
+                                },
                                 leading: DecoratedBox(
                                     decoration: BoxDecoration(
                                         shape: BoxShape.circle,
@@ -52,7 +58,7 @@ class DepartmentSummary extends ConsumerWidget {
                                       Padding(
                                         padding: const EdgeInsets.all(4.0),
                                         child: Text(
-                                            "Corpers: ${corpersList[department.name]}"),
+                                            "Corpers: ${data?.where((element) => element.department == department.name).where((element) => element.staffType == AddHocStaffType.corper).length}"),
                                       )
                                     ])),
                                     Row(
@@ -64,7 +70,7 @@ class DepartmentSummary extends ConsumerWidget {
                                         Padding(
                                           padding: const EdgeInsets.all(4.0),
                                           child: Text(
-                                              "SIWES: ${siwesList[department.name]}"),
+                                              "SIWES: ${data?.where((element) => element.department == department.name).where((element) => element.staffType == AddHocStaffType.siwes).length}"),
                                         ),
                                       ],
                                     ),
@@ -83,21 +89,5 @@ class DepartmentSummary extends ConsumerWidget {
           error: (er, st) => const Text("ERROR"),
           loading: () => const CircularProgressIndicator.adaptive(),
         );
-  }
-
-  sortedList(List<AddHocStaff>? allStaff) {
-    if (allStaff == null) return;
-    for (var person in allStaff) {
-      if (person.staffType == AddHocStaffType.corper) {
-        corpersList[person.department!] =
-            corpersList[person.department!] != null
-                ? corpersList[person.department!]! + 1
-                : 1;
-      } else {
-        siwesList[person.department!] = siwesList[person.department!] != null
-            ? siwesList[person.department!]! + 1
-            : 1;
-      }
-    }
   }
 }

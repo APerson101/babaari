@@ -1,4 +1,6 @@
+import 'package:babaari/dashboard/add_person_view.dart';
 import 'package:babaari/template_widgets.dart';
+import 'package:babaari/widgets/print_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -10,7 +12,6 @@ class DashboardView extends ConsumerWidget {
   const DashboardView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // return const AddPersonView();
     return Stack(
       children: [
         Positioned(
@@ -70,7 +71,7 @@ class _StatisticsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: DepartmentSummary());
+        child: const DepartmentSummary());
   }
 }
 
@@ -102,7 +103,10 @@ class _ButtonsView extends ConsumerWidget {
                       iconcolor: Colors.purple.shade300,
                       line1: 'Add',
                       line2: 'Person',
-                      onTap: () {}))),
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => const AddPersonView()));
+                      }))),
           Expanded(
               child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -110,12 +114,15 @@ class _ButtonsView extends ConsumerWidget {
                 backgroundcolor: Colors.red.shade200,
                 iconcolor: Colors.red.shade300,
                 icon: const Icon(
-                  Icons.remove,
+                  Icons.print,
                   size: 20,
                 ),
-                line1: 'Remove',
-                line2: 'Existing',
-                onTap: () {}),
+                line1: 'Print',
+                line2: 'Letter',
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const PrintView()));
+                }),
           )),
           const VerticalDivider(),
           Expanded(
@@ -148,6 +155,6 @@ class _DailyActivityView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: const RecentActionsView());
+        child: RecentActionsView());
   }
 }

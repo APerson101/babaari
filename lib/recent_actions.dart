@@ -8,12 +8,14 @@ import 'package:timeline_tile/timeline_tile.dart';
 import 'models/activity.dart';
 
 class RecentActionsView extends ConsumerWidget {
-  const RecentActionsView({super.key});
+  RecentActionsView({super.key});
 
+  final scroll = ScrollController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(todayActivities);
     final allActivity = ref.watch(todayActivities);
+
     return Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
@@ -28,14 +30,21 @@ class RecentActionsView extends ConsumerWidget {
         ),
         child: allActivity.when(
             data: (activities) {
-              if (activities == null) {
+              if (activities.isEmpty) {
                 return const Center(
-                  child: Text("No activity today yet"),
+                  child: Text("No activities today yet"),
                 );
               }
+              scroll.hasClients
+                  ? scroll.animateTo(scroll.position.maxScrollExtent,
+                      duration: const Duration(seconds: 2),
+                      curve: Curves.fastOutSlowIn)
+                  : null;
               return ListView.builder(
+                  controller: scroll,
                   itemCount: activities.length,
                   itemBuilder: (context, index) {
+                    activities = activities.reversed.toList();
                     return _buildTimelineTile(
                         indicator: const _IconIndicator(
                             iconData: Icons.sunny, size: 20),

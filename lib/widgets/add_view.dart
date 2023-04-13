@@ -1,3 +1,5 @@
+import 'package:babaari/activity/activity_providers.dart';
+import 'package:babaari/models/activity.dart';
 import 'package:babaari/models/department.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -88,6 +90,12 @@ class _InfoView extends ConsumerWidget {
                                                 content: Text("DELETING")));
                                         await ref.watch(deleteDpt);
                                         if (context.mounted) {
+                                          ref.watch(addActivity(Activity()
+                                            ..created = DateTime.now()
+                                            ..message =
+                                                'Deleted ${dpt.name} department'
+                                            ..type = ActivityType.delete
+                                            ..staffID = 'admin'));
                                           ScaffoldMessenger.of(context1)
                                               .showSnackBar(const SnackBar(
                                                   backgroundColor: Colors.green,
@@ -174,12 +182,19 @@ class _EditView extends ConsumerWidget {
                       selectedDpt?.units = formatted;
                       await ref.watch(updateDpt(selectedDpt!));
                       ref.invalidate(_newUnits);
+
                       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                           backgroundColor: Colors.green,
                           content: Text("SUCCESS")));
                       ref.watch(_isSaving.notifier).state = false;
 
                       ref.watch(_isEditing.notifier).state = true;
+
+                      ref.watch(addActivity(Activity()
+                        ..created = DateTime.now()
+                        ..message = 'Updated ${selectedDpt.name} department'
+                        ..type = ActivityType.update
+                        ..staffID = 'admin'));
                     }
                   },
                   child: const Text("Save Changes")),
@@ -265,8 +280,10 @@ class _EditView extends ConsumerWidget {
 }
 //*
 // ADD DEPARTMENTS AND UNITS: DONE
-// ADD PRINT
-// TEST DASHBOARD
+// ADD PRINT: SOMEWHAT ALMOST THERE: DONE
+// simulate printing and new form : DONE
+// TEST DASHBOARD: DONE
+// Proper filtering with bank stuff
 // *//
 
 final _isEditing = StateProvider.autoDispose((ref) => false);

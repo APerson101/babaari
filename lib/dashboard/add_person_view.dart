@@ -10,21 +10,31 @@ class AddPersonView extends HookConsumerWidget {
   const AddPersonView({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Stack(
-      children: [
-        Positioned(
-            left: 10,
-            top: 10,
-            bottom: 10,
-            width: MediaQuery.of(context).size.width * 0.3,
-            child: const FormControllerView()),
-        Positioned(
-            right: 10,
-            top: 10,
-            bottom: 10,
-            width: MediaQuery.of(context).size.width * 0.65,
-            child: const CurrentFormView()),
-      ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: BackButton(
+          onPressed: () {
+            ref.watch(numberOfPeople.notifier).state = 0;
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: Stack(
+        children: [
+          Positioned(
+              left: 10,
+              top: 10,
+              bottom: 10,
+              width: MediaQuery.of(context).size.width * 0.3,
+              child: const FormControllerView()),
+          Positioned(
+              right: 10,
+              top: 10,
+              bottom: 10,
+              width: MediaQuery.of(context).size.width * 0.65,
+              child: const CurrentFormView()),
+        ],
+      ),
     );
   }
 }
@@ -186,9 +196,9 @@ class FormControllerView extends HookConsumerWidget {
   }
 }
 
-final selectedTab = StateProvider((ref) => 0);
+final selectedTab = StateProvider.autoDispose((ref) => 0);
 final numberOfPeople = StateProvider((ref) => 0);
-final _placeHolder = StateProvider((ref) {
+final _placeHolder = StateProvider.autoDispose((ref) {
   return ref.watch(selectedTab) == 0
       ? 'Enter number of Corpers'
       : "Enter number of SIWES Students";

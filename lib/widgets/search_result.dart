@@ -1,4 +1,5 @@
 import 'package:babaari/activity/activity_providers.dart';
+import 'package:babaari/widgets/print_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -27,12 +28,22 @@ class SearchResult extends ConsumerWidget {
                 columnWidthMode: ColumnWidthMode.fill,
                 controller: controller,
                 selectionMode: SelectionMode.single,
-                onSelectionChanged: (selectedRow, _) {
-                  // move to the more info page about the person selected
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => AddHocInfoView(
-                            staff: data[controller.selectedIndex],
-                          )));
+                onCellTap: (cellDets) {
+                  if (cellDets.column.columnName == 'Print') {
+                    Navigator.of(context)
+                        .push(MaterialPageRoute(builder: (context) {
+                      return PrintView(
+                        person: data[cellDets.rowColumnIndex.rowIndex - 1],
+                      );
+                    }));
+                  } else {
+                    var selection = controller.selectedIndex;
+                    controller.selectedIndex = -1;
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => AddHocInfoView(
+                              staff: data[cellDets.rowColumnIndex.rowIndex - 1],
+                            )));
+                  }
                 },
                 source: SearchResultDataSource(people: data),
                 columns: [
@@ -43,6 +54,8 @@ class SearchResult extends ConsumerWidget {
                       label: const Text('First name')),
                   GridColumn(
                       columnName: 'last name', label: const Text('Last Name')),
+                  GridColumn(
+                      columnName: 'Print', label: const Text('Print Letter')),
                 ]);
           },
           error: (er, st) =>
@@ -62,10 +75,12 @@ class SearchResultDataSource extends DataGridSource {
               DataGridCell(columnName: 'last name', value: person.lastname),
               DataGridCell(
                   columnName: 'type', value: describeEnum(person.staffType)),
+              const DataGridCell(columnName: 'Print', value: 'Print'),
             ]))
         .toList();
   }
   List<DataGridRow> data = [];
+
   @override
   List<DataGridRow> get rows => data;
   @override
@@ -75,7 +90,13 @@ class SearchResultDataSource extends DataGridSource {
             .getCells()
             .map((e) => Container(
                   alignment: Alignment.center,
-                  child: Text(e.value.toString()),
+                  child: e.columnName == 'Print'
+                      ? DecoratedBox(
+                          decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(20)),
+                          child: Center(child: Text(e.value.toString())))
+                      : Text(e.value.toString()),
                 ))
             .toList());
   }

@@ -24,14 +24,16 @@ class CurrentFormView extends ConsumerWidget {
                   top: 5,
                   left: 5,
                   right: 5,
+                  bottom: 50,
                   child: AddHocForm(
                       addHocStaff: ref.watch(allForms)[indexToView],
                       formMode: form)),
               Positioned(
-                bottom: 10,
-                left: 10,
+                bottom: 0,
+                left: 0,
                 right: 0,
                 child: ButtonBar(
+                  alignment: MainAxisAlignment.spaceBetween,
                   children: [
                     TextButton(
                         onPressed: () {

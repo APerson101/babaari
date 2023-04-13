@@ -1,3 +1,5 @@
+import 'package:babaari/activity/activity_providers.dart';
+import 'package:babaari/models/activity.dart';
 import 'package:babaari/models/adhocstaff.dart';
 import 'package:babaari/widgets/staff_activity.dart';
 import 'package:babaari/widgets/view_providers.dart';
@@ -66,12 +68,21 @@ class _StaffInfo extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var editing = ref.watch(isEditing);
-
+    var startDate = ref.watch(startDateProvider);
+    startDate ??= staff.startDate;
+    startDate ??= DateTime.now();
+    var endDate = ref.watch(endDateViewProvider);
+    endDate ??= staff.endDate;
+    endDate ??= DateTime.now();
     ref.listen(saveButtonPressed, (pr, nx) async {
       if (pr != nx && nx) {
         if (!validate()) {
           return;
         }
+        var sDate = ref.watch(startDateProvider);
+        sDate ??= startDate;
+        var eDate = ref.watch(startDateProvider);
+        eDate ??= endDate;
         staff.firstname = _controllers[0].text;
         staff.lastname = _controllers[1].text;
         staff.phoneNumber = _controllers[2].text;
@@ -85,8 +96,8 @@ class _StaffInfo extends ConsumerWidget {
         staff.department = _controllers[10].text;
         staff.unit = _controllers[11].text;
         staff.staffID = _controllers[12].text;
-        staff.startDate = ref.watch(startDateProvider);
-        staff.startDate = ref.watch(endDateViewProvider);
+        staff.startDate = sDate;
+        staff.endDate = eDate;
         staff.nokName = _controllers[15].text;
         staff.nokAddress = _controllers[16].text;
         staff.nokNumber = _controllers[17].text;
@@ -98,6 +109,12 @@ class _StaffInfo extends ConsumerWidget {
           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
               backgroundColor: Colors.green, content: Text("SUCCESS!")));
         }
+        ref.watch(addActivity(Activity()
+          ..created = DateTime.now()
+          ..type = ActivityType.update
+          ..staffID = staff.staffID
+          ..message =
+              'Successfully updated ${staff.firstname} ${staff.lastname}'));
       }
     });
     return SafeArea(
@@ -250,17 +267,12 @@ class _StaffInfo extends ConsumerWidget {
                                       : null;
                                 },
                                 child: const Text("Select Start Date")),
-                            trailing: Text(DateFormat.yMd().format(
-                                ref.watch(startDateProvider) ??
-                                    staff.startDate ??
-                                    DateTime.now())),
+                            trailing: Text(DateFormat.yMd().format(startDate)),
                           )
                         : ListTile(
                             title: const Text("Start Date"),
-                            trailing: Text(DateFormat.yMd().format(
-                                ref.watch(startDateProvider) ??
-                                    staff.startDate ??
-                                    DateTime.now())))),
+                            trailing:
+                                Text(DateFormat.yMd().format(startDate)))),
                 Expanded(
                     child: editing
                         ? ListTile(
@@ -279,17 +291,11 @@ class _StaffInfo extends ConsumerWidget {
                                       : null;
                                 },
                                 child: const Text("Select End Date")),
-                            trailing: Text(DateFormat.yMd().format(
-                                ref.watch(endDateViewProvider) ??
-                                    staff.endDate ??
-                                    DateTime.now())),
+                            trailing: Text(DateFormat.yMd().format(endDate)),
                           )
                         : ListTile(
                             title: const Text("End Date"),
-                            trailing: Text(DateFormat.yMd().format(
-                                ref.watch(endDateViewProvider) ??
-                                    staff.endDate ??
-                                    DateTime.now())),
+                            trailing: Text(DateFormat.yMd().format(endDate)),
                           ))
               ]),
               Row(children: [

@@ -25,6 +25,7 @@ final todayActivitesUpdater = StreamProvider.autoDispose((ref) async* {
   updatedActivity.listen((_) {
     //update latest activity
     ref.invalidate(todayActivities);
+    ref.invalidate(getAllActivity);
   });
 });
 
@@ -41,4 +42,11 @@ final findNameMatches = FutureProvider.family
       .lastnameContains(text, caseSensitive: false)
       .findAll();
   return List.from(firstNameMatches)..addAll(lastNameMatches);
+});
+
+final addActivity =
+    FutureProvider.family.autoDispose<void, Activity>((ref, activity) async {
+  var isar = GetIt.I<Isar>();
+  await isar.writeTxn(() async => await isar.activitys.put(activity));
+  return;
 });

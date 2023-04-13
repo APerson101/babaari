@@ -1,13 +1,19 @@
+import 'dart:math';
+
 import 'package:babaari/dashboard/dashboard_providers.dart';
+import 'package:babaari/models/activity.dart';
 import 'package:babaari/models/adhocstaff.dart';
+import 'package:babaari/models/department.dart';
 import 'package:babaari/widgets/widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:isar/isar.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+import 'activity/activity_providers.dart';
 import 'helpers/database.dart';
 import 'widgets/addhoc_info_view.dart';
 
@@ -23,9 +29,7 @@ class PeopleView extends ConsumerWidget {
       ),
       body: creator.when(data: (_) {
         // show table of everyone
-        return const Center(
-          child: Text("search for anything"),
-        );
+        return Center(child: _PeopleView());
       }, error: (Object error, StackTrace stackTrace) {
         return const Center(child: Text("ERROR"));
       }, loading: () {
@@ -38,36 +42,57 @@ class PeopleView extends ConsumerWidget {
 final createPeople = FutureProvider((ref) async {
   return;
   var isar = GetIt.I<DatabaseHelper>();
+  var department = await GetIt.I<Isar>().departments.where().findAll();
 
-  await isar.saveStaff(List.generate(
-      30,
-      (index) => AddHocStaff()
-        ..accountName = 'Account Name'
-        ..accountNumber = '0123849688'
-        ..bankName = 'GTBank'
-        ..courseOfStudy = 'Computer Science'
-        ..department = 'ITIS'
-        ..unit = 'Software'
-        ..endDate = DateTime.now()
-        ..startDate = DateTime.now()
-        ..firstname = 'Abdulhadi'
-        ..lastname = 'Hashim'
-        ..houseAddress = 'Wuse, Abuja'
-        ..phoneNumber = '08159730537'
-        ..institutionName = 'Afe Babalola University'
-        ..institutionID = 'FC/21C/10200'
-        ..nokAddress = 'Amina close'
-        ..staffType = AddHocStaffType.corper
-        ..nokName = 'Sister'
-        ..nokNumber = '09124630793'
-        ..staffID = '${index + 1}'
-        ..registeredDate = DateTime.now()));
+  await isar.saveStaff(List.generate(30, (index) {
+    var dpt = Random.secure().nextInt(department.length);
+    var unitsAll = department[dpt].units;
+    return AddHocStaff()
+      ..accountName = 'Account Name'
+      ..accountNumber = '0123849688'
+      ..bankName = 'GTBank'
+      ..courseOfStudy = 'Computer Science'
+      ..department = department[dpt].name
+      ..unit = unitsAll![Random.secure().nextInt(unitsAll.length)]
+      ..endDate = DateTime.now()
+      ..startDate = DateTime.now()
+      ..firstname = 'Abdulhadi'
+      ..lastname = 'Hashim'
+      ..houseAddress = 'Wuse, Abuja'
+      ..phoneNumber = '08159730537'
+      ..institutionName = 'Afe Babalola University'
+      ..institutionID = 'FC/21C/10200'
+      ..nokAddress = 'Amina close'
+      ..staffType = AddHocStaffType.values[Random.secure().nextInt(2)]
+      ..nokName = 'Sister'
+      ..nokNumber = '09124630793'
+      ..staffID = '${index + 1}'
+      ..registeredDate = DateTime.now();
+  }));
 });
 
 class _PeopleView extends ConsumerWidget {
-  const _PeopleView();
+  _PeopleView();
+  String nameToBeDeleted = "";
+  String idToBeDeleted = '';
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.listen(isDeletingStaff, (previous, next) {
+      next == DeleteStaffEnum.deleting
+          ? {
+              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                content: Text("Successfully deleted!"),
+                backgroundColor: Colors.green,
+              )),
+              ref.watch(isDeletingStaff.notifier).state = DeleteStaffEnum.idle,
+              ref.watch(addActivity(Activity()
+                ..created = DateTime.now()
+                ..message = 'Successfully deleted $nameToBeDeleted'
+                ..type = ActivityType.delete
+                ..staffID = idToBeDeleted))
+            }
+          : null;
+    });
     var controller = DataGridController();
 
     return ref.watch(allAdhocStaff).when(data: (staff) {
@@ -76,28 +101,42 @@ class _PeopleView extends ConsumerWidget {
       }
       return SfDataGrid(
           allowSorting: true,
-          allowMultiColumnSorting: true,
+          allowColumnsResizing: true,
+          allowFiltering: true,
           columnWidthMode: ColumnWidthMode.fill,
           selectionMode: SelectionMode.single,
+          controller: controller,
           onSelectionChanged: (selectedRow, _) {
+            var selection = controller.selectedIndex;
+            controller.selectedIndex = -1;
             Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => AddHocInfoView(
-                      staff: staff[controller.selectedIndex],
+                      staff: staff[selection],
                     )));
           },
           source: _PeopleDataSource(staff, (id) async {
-            ref.watch(deleteStaff(id)).when(data: (_) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  backgroundColor: Colors.green,
-                  content: Text("Delete successful")));
-            }, error: (er, st) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  backgroundColor: Colors.red,
-                  content: Text("Error when trying to delete")));
-            }, loading: () {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                  backgroundColor: Colors.white, content: Text("Deleting")));
-            });
+            await showDialog(
+                context: context,
+                builder: (context) => AlertDialog(
+                      title: Text(
+                          "Confirm deleting of ${staff[id].firstname} ${staff[id].lastname}"),
+                      actions: [
+                        TextButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Cancel")),
+                        TextButton(
+                            onPressed: () async {
+                              nameToBeDeleted =
+                                  "${staff[id].firstname} ${staff[id].lastname}";
+                              idToBeDeleted = id.toString();
+                              ref.watch(deleteStaff(id));
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text("Continue")),
+                      ],
+                    ));
           }),
           columns: [
             GridColumn(columnName: 'id', label: const Text('ID')),
@@ -165,7 +204,7 @@ class _PeopleDataSource extends DataGridSource {
         cells: row.getCells().map((e) {
       return Container(
         alignment: Alignment.center,
-        child: e.columnName == 'delete'
+        child: e.columnName == 'Delete'
             ? ElevatedButton(
                 onPressed: () => deletePerson(e.value),
                 child: const Text('del'))
@@ -174,3 +213,7 @@ class _PeopleDataSource extends DataGridSource {
     }).toList());
   }
 }
+
+final isDeletingStaff = StateProvider((ref) => DeleteStaffEnum.idle);
+
+enum DeleteStaffEnum { idle, deleting, done }

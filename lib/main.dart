@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:babaari/helpers/database.dart';
 import 'package:babaari/main_view.dart';
+import 'package:babaari/widgets/printing_types.dart';
 import 'package:docx_template/docx_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +15,8 @@ import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
+import 'activity/activity_providers.dart';
+import 'dashboard/dashboard_providers.dart';
 import 'models/activity.dart';
 import 'models/adhocstaff.dart';
 import 'models/department.dart';
@@ -22,6 +25,7 @@ void main() async {
   GetIt.I.registerSingleton<Isar>(
       await Isar.open([AddHocStaffSchema, ActivitySchema, DepartmentSchema]));
   GetIt.I.registerSingleton<DatabaseHelper>(DatabaseHelper());
+  GetIt.I.registerSingleton<PrinterDoc>(PrinterDoc());
   runApp(ProviderScope(child: MyApp()));
 }
 
@@ -34,6 +38,9 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(newPersonAdded);
+    ref.watch(newDepartmentAdded);
+    ref.watch(todayActivitesUpdater);
     ref.listen(saveTemplate, (pr, nx) async {
       if (pr != nx && nx) {
         var data = await rootBundle.load('templates/template.docx');

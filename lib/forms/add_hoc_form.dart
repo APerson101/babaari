@@ -1,100 +1,99 @@
+import 'package:babaari/dashboard/add_person_view.dart';
+import 'package:babaari/widgets/view_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../dashboard/dashboard_providers.dart';
 import '../models/adhocstaff.dart';
+import '../widgets/widgets.dart';
 import 'current_form_view.dart';
 
 class AddHocForm extends ConsumerWidget {
   AddHocForm({super.key, required this.addHocStaff, required this.formMode});
   final AddHocStaff addHocStaff;
   final FormModes formMode;
-  final TextEditingController firstNameController = TextEditingController();
-  final TextEditingController lastNameController = TextEditingController();
-  final TextEditingController addressNameController = TextEditingController();
-  final TextEditingController tagNameController = TextEditingController();
-  final TextEditingController anotherTagNameController =
-      TextEditingController();
+  final List<TextEditingController> _controllers =
+      List.generate(18, (index) => TextEditingController());
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    firstNameController.text = addHocStaff.firstname ?? '';
-    lastNameController.text = addHocStaff.lastname ?? '';
-    addressNameController.text = addHocStaff.houseAddress ?? '';
-    tagNameController.text = addHocStaff.accountName ?? '';
-    anotherTagNameController.text = addHocStaff.bankName ?? '';
-
-    return Form(
-        child: SingleChildScrollView(
-      child: Column(
-        children: [
-          Row(children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FormFieldModel(
-                onChanged: (name) => addHocStaff.firstname = name,
-                controller: firstNameController,
-                hintText: 'Enter first name',
+    final dpts = ref.watch(allDepartments);
+    return dpts.maybeWhen(data: (data) {
+      return SingleChildScrollView(
+        child: Column(
+          children: [
+            Row(children: [
+              Expanded(
+                child: EditableLabel(
+                  controller: _controllers[0],
+                  label: labels[0],
+                  isEditing: true,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: FormFieldModel(
-                onChanged: (name) => addHocStaff.lastname = name,
-                controller: lastNameController,
-                hintText: 'Enter last name',
+              const SizedBox(
+                width: 20,
               ),
-            ),
-          ]),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FormFieldModel(
-              onChanged: (address) => addHocStaff.houseAddress = address,
-              controller: addressNameController,
-              hintText: 'Enter address',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FormFieldModel(
-              onChanged: (tag) => addHocStaff.accountName = tag,
-              controller: tagNameController,
-              hintText: 'Enter tag name',
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: FormFieldModel(
-              onChanged: (tagger) => addHocStaff.bankName = tagger,
-              controller: anotherTagNameController,
-              hintText: 'Enter another tag name',
-            ),
-          ),
-        ],
-      ),
-    ));
+              Expanded(
+                child: EditableLabel(
+                  controller: _controllers[1],
+                  label: labels[1],
+                  isEditing: true,
+                ),
+              ),
+            ]),
+            ...List.generate(_controllers.length - 2, (index) {
+              if (index == 8) {
+                return DropdownButton(
+                    value: ref.watch(_selectedDpt),
+                    items: data
+                        .map((e) => DropdownMenuItem(
+                            value: data.indexOf(e), child: Text(e.name ?? "")))
+                        .toList(),
+                    onChanged: (selected) {
+                      if (selected != null) {
+                        _controllers[10].text = data[selected].name!;
+                        ref.watch(_selectedDpt.notifier).state = selected;
+                      }
+                    });
+              }
+              if (index == 9) {
+                var department = data[ref.watch(_selectedDpt)];
+                return DropdownButton(
+                    value: ref.watch(_selectedUnit),
+                    items: department.units!
+                        .map((e) => DropdownMenuItem(
+                            value: department.units?.indexOf(e),
+                            child: Text(e)))
+                        .toList(),
+                    onChanged: (selected) {
+                      if (selected != null) {
+                        _controllers[11].text = department.units![selected];
+                        ref.watch(_selectedUnit.notifier).state = selected;
+                      }
+                    });
+              } else {
+                var num = index + 2;
+                var label = index == 4
+                    ? ref.watch(selectedTab) == 0
+                        ? "State Code"
+                        : "School ID"
+                    : labels[num];
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: EditableLabel(
+                      isEditing: true,
+                      controller: _controllers[num],
+                      label: label),
+                );
+              }
+            })
+          ],
+        ),
+      );
+    }, orElse: () {
+      return const CircularProgressIndicator.adaptive();
+    });
   }
 }
 
-class FormFieldModel extends ConsumerWidget {
-  const FormFieldModel(
-      {super.key,
-      required this.hintText,
-      required this.controller,
-      required this.onChanged});
-  final String hintText;
-  final TextEditingController controller;
-  final void Function(String)? onChanged;
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: 200,
-      child: TextFormField(
-        onChanged: onChanged,
-        controller: controller,
-        decoration: InputDecoration(
-            hintText: hintText,
-            border:
-                OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
-      ),
-    );
-  }
-}
+final _selectedDpt = StateProvider((ref) => 0);
+final _selectedUnit = StateProvider((ref) => 0);

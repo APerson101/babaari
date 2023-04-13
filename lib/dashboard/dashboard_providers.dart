@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
 
+import '../people_view.dart';
 import '../widgets/add_view.dart';
 
 final newPersonAdded = StreamProvider.autoDispose((ref) async* {
@@ -62,6 +63,7 @@ final deleteStaff =
     FutureProvider.autoDispose.family<void, Id>((ref, id) async {
   var isar = GetIt.I<DatabaseHelper>();
   await isar.deleteStaff(id);
+  ref.watch(isDeletingStaff.notifier).state = DeleteStaffEnum.deleting;
 });
 
 final updateDpt =
@@ -83,4 +85,10 @@ final getStaffActivity =
     FutureProvider.autoDispose.family<List<Activity>, String>((ref, id) async {
   var isar = GetIt.I<Isar>();
   return await isar.activitys.filter().staffIDEqualTo(id).findAll();
+});
+
+final getDepartmentStaff = FutureProvider.autoDispose
+    .family<List<AddHocStaff>, String>((ref, dpt) async {
+  var isar = GetIt.I<Isar>();
+  return await isar.addHocStaffs.filter().departmentContains(dpt).findAll();
 });

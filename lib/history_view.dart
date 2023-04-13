@@ -37,21 +37,26 @@ class _DataTable extends ConsumerWidget {
       GridColumn(columnName: 'Date', label: const Text('Date')),
       GridColumn(columnName: 'addHoc ID', label: const Text('AddHoc ID')),
       GridColumn(columnName: 'Activity', label: const Text('Activity Type')),
+      GridColumn(columnName: 'Message', label: const Text('Message')),
     ]);
   }
 }
 
 class _ActivityDataSource extends DataGridSource {
   _ActivityDataSource(List<Activity> activities) {
-    activities.map((activity) => data.add(DataGridRow(cells: [
-          DataGridCell(columnName: 'ID', value: activity.id),
-          DataGridCell(
-              columnName: 'Date',
-              value: DateFormat.yMd().add_jms().format(activity.created!)),
-          DataGridCell(columnName: 'addHoc ID', value: activity.staffID ?? '-'),
-          DataGridCell(
-              columnName: 'Activity', value: describeEnum(activity.type)),
-        ])));
+    data = activities
+        .map((activity) => DataGridRow(cells: [
+              DataGridCell(columnName: 'ID', value: activity.id),
+              DataGridCell(
+                  columnName: 'Date',
+                  value: DateFormat.yMd().add_jms().format(activity.created!)),
+              DataGridCell(
+                  columnName: 'addHoc ID', value: activity.staffID ?? '-'),
+              DataGridCell(
+                  columnName: 'Activity', value: describeEnum(activity.type)),
+              DataGridCell(columnName: 'Message', value: activity.message),
+            ]))
+        .toList();
   }
   List<DataGridRow> data = [];
 
@@ -60,12 +65,6 @@ class _ActivityDataSource extends DataGridSource {
   @override
   DataGridRowAdapter? buildRow(DataGridRow row) {
     return DataGridRowAdapter(
-        cells: row
-            .getCells()
-            .map((e) => Container(
-                alignment: Alignment.center,
-                padding: const EdgeInsets.all(10),
-                child: Text(e.value.toString())))
-            .toList());
+        cells: row.getCells().map((e) => Text(e.value.toString())).toList());
   }
 }
