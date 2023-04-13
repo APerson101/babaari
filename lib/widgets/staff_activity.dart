@@ -64,6 +64,12 @@ class _StaffActivitySource extends DataGridSource {
           type = 'Final Clearance printed';
 
           break;
+        case ActivityType.siwesCompletion:
+          type = 'SIWES completion letter printed';
+          break;
+        case ActivityType.departmentPosting:
+          type = 'Department posting letter printed';
+          break;
       }
       return DataGridRow(cells: [
         DataGridCell(columnName: 'Type', value: type),

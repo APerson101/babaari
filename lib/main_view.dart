@@ -11,7 +11,7 @@ class MainView extends ConsumerWidget {
   final _sideMenuController = SideMenuController();
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // return Scaffold(appBar: AppBar(), body: const AddView());
+    return Scaffold(appBar: AppBar(), body: const PeopleView());
     return Scaffold(
         body: Row(
       children: [

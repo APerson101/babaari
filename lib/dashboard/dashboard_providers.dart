@@ -60,9 +60,9 @@ final allDepartments = AutoDisposeFutureProvider((ref) async {
 });
 
 final deleteStaff =
-    FutureProvider.autoDispose.family<void, Id>((ref, id) async {
+    FutureProvider.autoDispose.family<void, List<Id>>((ref, id) async {
   var isar = GetIt.I<DatabaseHelper>();
-  await isar.deleteStaff(id);
+  await isar.deleteStaffs(id);
   ref.watch(isDeletingStaff.notifier).state = DeleteStaffEnum.deleting;
 });
 

@@ -50,3 +50,9 @@ final addActivity =
   await isar.writeTxn(() async => await isar.activitys.put(activity));
   return;
 });
+final addActivities = FutureProvider.family
+    .autoDispose<void, List<Activity>>((ref, activity) async {
+  var isar = GetIt.I<Isar>();
+  await isar.writeTxn(() async => await isar.activitys.putAll(activity));
+  return;
+});

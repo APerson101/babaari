@@ -88,9 +88,9 @@ class DatabaseHelper {
     });
   }
 
-  deleteStaff(Id id) async {
+  deleteStaffs(List<Id> id) async {
     return await isar.writeTxn(() async {
-      return await isar.addHocStaffs.delete(id);
+      return await isar.addHocStaffs.deleteAll(id);
     });
   }
 
