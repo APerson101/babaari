@@ -25,14 +25,15 @@ class DPTinfoView extends ConsumerWidget {
             child: SfDataGrid(
                 selectionMode: SelectionMode.single,
                 onCellTap: (cellDets) {
-                  if (cellDets.column.columnName == 'print') {
+                  if (cellDets.column.columnName == 'print' &&
+                      cellDets.rowColumnIndex.rowIndex != 0) {
                     Navigator.of(context)
                         .push(MaterialPageRoute(builder: (context) {
                       return PrintView(
                         person: data[cellDets.rowColumnIndex.rowIndex - 1],
                       );
                     }));
-                  } else {
+                  } else if (cellDets.rowColumnIndex.rowIndex != 0) {
                     var sel = controller.selectedIndex;
                     controller.selectedIndex = -1;
                     Navigator.of(context)

@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:babaari/forms/current_form_view.dart';
 import 'package:flutter/foundation.dart';
 import 'package:get_it/get_it.dart';
 import 'package:isar/isar.dart';
@@ -20,14 +19,16 @@ class DatabaseHelper {
       await isar.addHocStaffs.put(person);
     });
     await _saveNamesCSV([person]);
+    await _saveSchools([person]);
   }
 
-  saveForms(FormModes type, List data) async {
+  saveForms(List data) async {
     debugPrint('saving the data...');
 
     List<AddHocStaff> list = [];
     for (var entry in data) {
-      list.add(entry as AddHocStaff);
+      list.add((entry as AddHocStaff)..registeredDate = DateTime.now());
+      debugPrint(entry.toString());
     }
     await _saveStaff(list);
 
@@ -45,7 +46,8 @@ class DatabaseHelper {
     await isar.writeTxn(() async {
       await isar.addHocStaffs.putAll(staff);
     });
-    _saveNamesCSV(staff);
+    await _saveNamesCSV(staff);
+    await _saveSchools(staff);
     return true;
   }
 
@@ -74,24 +76,50 @@ class DatabaseHelper {
     return true;
   }
 
+  _saveSchools(List<AddHocStaff> people) async {
+    var schools =
+        List.generate(people.length, (index) => people[index].institutionName);
+    schools = schools.toSet().toList();
+    var currentCSV = await loadCSVSchool();
+    if (schools.isNotEmpty) {
+      for (var school in schools) {
+        currentCSV.add(school!);
+      }
+    }
+    String allSchoolsCSV = '';
+    for (var school in currentCSV) {
+      allSchoolsCSV += '$school,';
+    }
+    (await File(
+            '${(await getApplicationDocumentsDirectory()).path}/schools.txt')
+        .writeAsString(allSchoolsCSV.toLowerCase()));
+    return true;
+  }
+
   saveStaff(dynamic staff) async {
     await clearStaff();
-    await Future.delayed(const Duration(seconds: 2));
+    // await Future.delayed(const Duration(seconds: 2));
     await clearSuggestions();
-    await Future.delayed(const Duration(seconds: 2));
+    await clearSchoolSuggestions();
+    // await Future.delayed(const Duration(seconds: 2));
     await _saveStaff(staff);
+    // await _saveSchools(staff);
   }
 
   clearStaff() async {
     await isar.writeTxn(() async {
-      await isar.addHocStaffs.clear();
+      await isar.clear();
+      // await isar.addHocStaffs.clear();
     });
   }
 
   deleteStaffs(List<Id> id) async {
-    return await isar.writeTxn(() async {
+    var status = await isar.writeTxn(() async {
       return await isar.addHocStaffs.deleteAll(id);
     });
+
+    debugPrint('status of deleting is: $id is: $status');
+    return status;
   }
 
   updateDepartment(Department dpt) async {
@@ -115,8 +143,29 @@ class DatabaseHelper {
     }
   }
 
+  Future<List<String>> loadCSVSchool() async {
+    try {
+      var directory = await getApplicationDocumentsDirectory();
+      directory = await directory.create();
+      var file =
+          await File('${directory.path}/schools.txt').create(recursive: true);
+      var string = await file.readAsString();
+      var splitted = string.split(',')..removeWhere((element) => element == '');
+      return splitted;
+    } catch (e) {
+      debugPrint(e.toString());
+      return [''];
+    }
+  }
+
   clearSuggestions() async {
     (await File('${(await getApplicationDocumentsDirectory()).path}/names.txt')
+        .delete());
+  }
+
+  clearSchoolSuggestions() async {
+    (await File(
+            '${(await getApplicationDocumentsDirectory()).path}/schools.txt')
         .delete());
   }
 

@@ -17,6 +17,7 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   printing: ^5.10.1
   docx_template: ^0.3.3
+  pdf: ^3.10.1
   syncfusion_flutter_datagrid: ^20.4.54
   syncfusion_flutter_pdf: ^20.4.50
   syncfusion_flutter_pdfviewer: ^20.4.50

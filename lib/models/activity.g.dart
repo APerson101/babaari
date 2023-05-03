@@ -132,6 +132,8 @@ const _ActivitytypeEnumValueMap = {
   r'printmonthlyclearance': r'printmonthlyclearance',
   r'printAcceptanceLetter': r'printAcceptanceLetter',
   r'printfinalclearance': r'printfinalclearance',
+  r'siwesCompletion': r'siwesCompletion',
+  r'departmentPosting': r'departmentPosting',
 };
 const _ActivitytypeValueEnumMap = {
   r'create': ActivityType.create,
@@ -140,6 +142,8 @@ const _ActivitytypeValueEnumMap = {
   r'printmonthlyclearance': ActivityType.printmonthlyclearance,
   r'printAcceptanceLetter': ActivityType.printAcceptanceLetter,
   r'printfinalclearance': ActivityType.printfinalclearance,
+  r'siwesCompletion': ActivityType.siwesCompletion,
+  r'departmentPosting': ActivityType.departmentPosting,
 };
 
 Id _activityGetId(Activity object) {

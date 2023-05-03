@@ -27,6 +27,8 @@ class _NewPrint extends ConsumerWidget {
   final nameController = TextEditingController();
   final courseController = TextEditingController();
   final institutionController = TextEditingController();
+  final callUpController = TextEditingController();
+  final _selectedGender = StateProvider((ref) => 'M');
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
@@ -75,6 +77,16 @@ class _NewPrint extends ConsumerWidget {
                             : null;
                       },
                       child: const Text("Department Posting")),
+                  RadioMenuButton(
+                      value: 'rejection',
+                      groupValue: ref.watch(_corperPrintType),
+                      onChanged: (rejection) {
+                        rejection != null
+                            ? ref.watch(_corperPrintType.notifier).state =
+                                rejection
+                            : null;
+                      },
+                      child: const Text("Rejection Letter")),
                 ],
               ),
               TextFormField(
@@ -113,6 +125,23 @@ class _NewPrint extends ConsumerWidget {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30))),
               ),
+              ref.watch(_selectedType) == AddHocStaffType.corper
+                  ? TextFormField(
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      controller: callUpController,
+                      validator: (name) {
+                        return name == null
+                            ? null
+                            : name.isNotEmpty
+                                ? null
+                                : "Enter valid Call of number";
+                      },
+                      decoration: InputDecoration(
+                          labelText: "Enter call of number code",
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30))),
+                    )
+                  : const SizedBox(),
               TextFormField(
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 controller: courseController,
@@ -143,17 +172,38 @@ class _NewPrint extends ConsumerWidget {
                     border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30))),
               ),
+              DropdownButtonFormField(
+                  value: ref.watch(_selectedGender),
+                  items: const [
+                    DropdownMenuItem(value: "M", child: Text("Male")),
+                    DropdownMenuItem(value: "F", child: Text("Female")),
+                  ],
+                  onChanged: (selected) => ref
+                      .watch(_selectedGender.notifier)
+                      .state = selected ?? "M"),
               ElevatedButton(
                   onPressed: () async {
-                    var file = await GetIt.I<PrinterDoc>()
-                        .generateAcceptanceSIWES(AcceptanceSiwes(
-                            name: nameController.text,
-                            school: institutionController.text,
-                            schoolID: statecodeController.text));
-                    final pdf = File(file);
-
-                    await Printing.layoutPdf(
-                        onLayout: (_) => pdf.readAsBytes());
+                    String? file;
+                    var selected = ref.watch(_corperPrintType);
+                    if (selected == 'acceptance' ||
+                        selected == 'rejection' &&
+                            ref.watch(_selectedType) ==
+                                AddHocStaffType.corper) {
+                      file = await GetIt.I<PrinterDoc>().generateStatusNysc(
+                          person: AddHocStaff()
+                            ..firstname = nameController.text.split(' ')[0]
+                            ..lastname = nameController.text.split(' ')[1]
+                            ..callUpNumber = callUpController.text
+                            ..institutionID = statecodeController.text
+                            ..gender = ref.watch(_selectedGender)
+                            ..courseOfStudy = courseController.text,
+                          type: selected);
+                    }
+                    if (file != null) {
+                      final docx = File(file);
+                      await Printing.layoutPdf(
+                          onLayout: (_) => docx.readAsBytes());
+                    }
                   },
                   child: const Text("PRINT"))
             ],
@@ -181,8 +231,25 @@ class _ExistingPrint extends ConsumerWidget {
               child: Column(
                 children: [
                   ElevatedButton(
-                      onPressed: () {},
+                      onPressed: () async {
+                        var file = await GetIt.I<PrinterDoc>()
+                            .generateStatusNysc(
+                                person: person, type: 'acceptance');
+                        final docx = File(file);
+                        await Printing.layoutPdf(
+                            onLayout: (_) => docx.readAsBytes());
+                      },
                       child: const Text('Print Acceptance Letter')),
+                  ElevatedButton(
+                      onPressed: () async {
+                        var file = await GetIt.I<PrinterDoc>()
+                            .generateStatusNysc(
+                                person: person, type: 'rejection');
+                        final docx = File(file);
+                        await Printing.layoutPdf(
+                            onLayout: (_) => docx.readAsBytes());
+                      },
+                      child: const Text('Print Rejection Letter')),
                   isCorper
                       ? ElevatedButton(
                           onPressed: () {},

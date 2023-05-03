@@ -21,11 +21,18 @@ class AddHocStaff {
   String? nokAddress;
   String? houseAddress;
   String? staffID;
+  String? gender;
   String? institutionID;
+  String? callUpNumber;
   DateTime? registeredDate;
   String? bankName;
   String? accountNumber;
   String? accountName;
   @Enumerated(EnumType.name)
   late AddHocStaffType staffType;
+
+  @override
+  String toString() {
+    return '(id: $id, firstname: $firstname, lastname: $lastname, startDate: $startDate, endDate: $endDate, department: $department, unit: $unit, phoneNumber: $phoneNumber, nokName: $nokName, institutionName: $institutionName, courseOfStudy: $courseOfStudy, nokNumber: $nokNumber, nokAddress: $nokAddress, houseAddress: $houseAddress, staffID: $staffID, gender: $gender, institutionID: $institutionID, callUpNumber: $callUpNumber, registeredDate: $registeredDate, bankName: $bankName, accountNumber: $accountNumber, accountName: $accountName, staffType: $staffType)';
+  }
 }

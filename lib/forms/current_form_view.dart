@@ -1,5 +1,4 @@
 import 'package:babaari/dashboard/add_person_view.dart';
-import 'package:babaari/forms/add_hoc_form.dart';
 import 'package:babaari/forms/add_person_form.dart';
 import 'package:babaari/models/adhocstaff.dart';
 import 'package:flutter/foundation.dart';
@@ -8,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 
 import '../helpers/database.dart';
+import 'add_hoc_form.dart';
 
 class CurrentFormView extends ConsumerWidget {
   const CurrentFormView({super.key});
@@ -21,13 +21,16 @@ class CurrentFormView extends ConsumerWidget {
             children: [
               // Text(),
               Positioned(
-                  top: 5,
-                  left: 5,
-                  right: 5,
-                  bottom: 50,
-                  child: AddHocForm(
-                      addHocStaff: ref.watch(allForms)[indexToView],
-                      formMode: form)),
+                top: 5,
+                left: 5,
+                right: 5,
+                bottom: 50,
+                // child: Text("hello"),
+                child: AddHocForm(
+                    addHocStaff: ref.watch(allForms)[indexToView]
+                      ..staffType = form,
+                    formMode: form),
+              ),
               Positioned(
                 bottom: 0,
                 left: 0,
@@ -110,7 +113,10 @@ final allForms = StateProvider((ref) {
   return List.generate(ref.watch(numberOfPeople), (index) => AddHocStaff());
 });
 
-final formToUse = StateProvider((ref) => FormModes.corpers);
+final allDpts = StateProvider(
+    (ref) => List.generate(ref.watch(numberOfPeople), (index) => 0));
+
+final formToUse = StateProvider((ref) => AddHocStaffType.corper);
 
 enum FormModes { corpers, siwes }
 
@@ -148,8 +154,11 @@ class SavingProgressView extends ConsumerWidget {
                 ],
               );
             },
-            error: (er, st) =>
-                const AlertDialog(title: Center(child: Text("Failed to save"))),
+            error: (er, st) {
+              debugPrint(er.toString());
+              return const AlertDialog(
+                  title: Center(child: Text("Failed to save")));
+            },
             loading: () => const AlertDialog(
                 title: Center(child: CircularProgressIndicator.adaptive()))));
   }
@@ -158,7 +167,9 @@ class SavingProgressView extends ConsumerWidget {
 final saveProvider = FutureProvider.autoDispose((ref) async {
   await Future.delayed(const Duration(seconds: 2));
   var forms = ref.read(allForms);
-  var type = ref.read(formToUse);
   var db = GetIt.I<DatabaseHelper>();
-  await db.saveForms(type, forms);
+  for (var person in forms) {
+    print(person.toString());
+  }
+  await db.saveForms(forms);
 });

@@ -1,11 +1,13 @@
 import 'dart:io';
 
+import 'package:babaari/models/adhocstaff.dart';
 import 'package:flutter/painting.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PrinterDoc {
-  Future<String> generateAcceptanceSIWES(AcceptanceSiwes siwes) async {
+  Future<String> generateStatusSIWES(AcceptanceSiwes siwes) async {
     var doc = PdfDocument();
     doc.pages.add().graphics.drawString(
         'hello world ${siwes.name} from ${siwes.school} with id: ${siwes.schoolID}',
@@ -19,6 +21,129 @@ class PrinterDoc {
         .writeAsBytes((await doc.save())));
     return file.path;
   }
+
+  generateStatusNysc(
+      {required AddHocStaff person, required String type}) async {
+    try {
+      PdfFont subHeadingFont = PdfStandardFont(PdfFontFamily.helvetica, 12);
+
+      var todayDate = DateFormat.yMMMMd().format(DateTime.now());
+      var fileName = "NITDA/HQ/NYSC/016/VOL.XIII";
+      PdfDocument document = PdfDocument();
+      document.pageSettings.orientation = PdfPageOrientation.portrait;
+      document.pageSettings.margins.all = 30;
+      PdfPage page = document.pages.add();
+      PdfGraphics graphics = page.graphics;
+
+      PdfTextElement element =
+          PdfTextElement(text: todayDate, font: subHeadingFont);
+      var fileSize = subHeadingFont.measureString(fileName);
+      Rect bounds = Rect.fromLTWH(0, 160, graphics.clientSize.width, 30);
+      PdfLayoutResult result = element.draw(
+          page: page, bounds: Rect.fromLTWH(10, bounds.top + 8, 0, 0))!;
+      Offset textPosition = Offset(
+          graphics.clientSize.width - fileSize.width - 10, result.bounds.top);
+      graphics.drawString(fileName, subHeadingFont,
+          brush: element.brush,
+          bounds: textPosition & Size(fileSize.width + 2, 20));
+      // receiver
+      element = PdfTextElement(
+          text: 'The Coordinator',
+          font: PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 25, 0, 0))!;
+      element = PdfTextElement(
+          text: 'National Youth Service Corps (NYSC)\n'
+              'FCT Secretariat\n'
+              'Permanent Orientation Camp\n'
+              'Kubwa, Abuja.\n',
+          font: subHeadingFont);
+      element.brush = PdfBrushes.black;
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 10, 0, 0))!;
+
+      // letter type:
+      element = PdfTextElement(
+          text: 'LETTER OF ${type.toUpperCase()}',
+          font: PdfStandardFont(PdfFontFamily.helvetica, 12,
+              multiStyle: [PdfFontStyle.bold, PdfFontStyle.underline]));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 10, 0, 0))!;
+
+      // letter content:
+      element = PdfTextElement(
+          text:
+              'I am directed to notify the National Youth Service Corps that the Corps member with the\n'
+              'following data is hereby ${type == 'acceptance' ? "Accepted" : "Rejected"} to serve with the National Information Technology\n'
+              'Development Agency (NITDA).\n\n',
+          font: PdfStandardFont(
+            PdfFontFamily.helvetica,
+            12,
+          ),
+          format: PdfStringFormat(alignment: PdfTextAlignment.justify));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 10, 0, 0))!;
+
+      // details
+      element = PdfTextElement(
+          text:
+              'Name:                      ${person.lastname!.toUpperCase()} ${person.firstname!.toUpperCase()}\n\n'
+              'Sex:                         ${person.gender!.toUpperCase()}\n\n'
+              'Call up No.:             ${person.callUpNumber!.toUpperCase()}\n\n'
+              'FCT Code No.:        ${person.institutionID!.toUpperCase()}\n\n'
+              'Discipline:               ${person.courseOfStudy!.toUpperCase()}\n\n\n',
+          font: PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 10, 0, 0))!;
+      // regards
+      element = PdfTextElement(
+          text:
+              "Please accept the assurances of the Director General's highest esteemed regards.\n\n\n\n",
+          font: PdfStandardFont(
+            PdfFontFamily.helvetica,
+            12,
+          ));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 10, 0, 0))!;
+
+      // signer
+      element = PdfTextElement(
+          text: 'CHRISTIE IZI (MRS)',
+          font: PdfStandardFont(PdfFontFamily.helvetica, 12,
+              style: PdfFontStyle.bold));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 25, 0, 0))!;
+      element = PdfTextElement(
+          text: 'For: Director General/CEO\n\nCC:DG',
+          font: PdfStandardFont(
+            PdfFontFamily.helvetica,
+            12,
+          ));
+      result = element.draw(
+          page: page,
+          bounds: Rect.fromLTWH(10, result.bounds.bottom + 5, 0, 0))!;
+      var file = (await File(
+              '${(await getApplicationDocumentsDirectory()).path}/generated.pdf')
+          .writeAsBytes((await document.save())));
+      return file.path;
+    } catch (e) {
+      print(e.toString());
+      return null;
+    }
+
+// PdfDocument(inputBytes: File('input.pdf').readAsBytesSync())
+//         .pages[0]
+//         .createTemplate();
+  }
 }
 
 class AcceptanceSiwes {
@@ -29,5 +154,20 @@ class AcceptanceSiwes {
     required this.name,
     required this.school,
     required this.schoolID,
+  });
+}
+
+class RejectionNysc {
+  String name;
+  String callUpNumber;
+  String sex;
+  String fctCode;
+  String discipline;
+  RejectionNysc({
+    required this.name,
+    required this.callUpNumber,
+    required this.sex,
+    required this.fctCode,
+    required this.discipline,
   });
 }

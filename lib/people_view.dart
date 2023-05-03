@@ -23,20 +23,14 @@ class PeopleView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var creator = ref.watch(createPeople);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("All Corpers and Interns"),
-        actions: const [SearchBarWidget()],
-      ),
-      body: creator.when(data: (_) {
-        // show table of everyone
-        return Center(child: _PeopleView());
-      }, error: (Object error, StackTrace stackTrace) {
-        return const Center(child: Text("ERROR"));
-      }, loading: () {
-        return const CircularProgressIndicator.adaptive();
-      }),
-    );
+    return creator.when(
+        data: (val) => Center(child: _PeopleView()),
+        error: (Object error, StackTrace stackTrace) {
+          return const Text("");
+        },
+        loading: () {
+          return const CircularProgressIndicator.adaptive();
+        });
   }
 }
 
@@ -48,6 +42,22 @@ final createPeople = FutureProvider((ref) async {
   await isar.saveStaff(List.generate(30, (index) {
     var dpt = Random.secure().nextInt(department.length);
     var unitsAll = department[dpt].units;
+
+    var univesities = [
+      'Abia State University',
+      'Abubakar Tafawa Balewa University',
+      'Achievers University',
+      'Adamawa State University',
+      'Adekunle Ajasin University',
+      'Adeleke University	Osun',
+      'Afe Babalola University',
+      'Ahmadu Bello University',
+      'Ajayi Crowther University',
+      'Akwa Ibom State University',
+      'Al-Hikmah University',
+      'Ambrose Alli University',
+      'American University of Nigeria',
+    ];
     return AddHocStaff()
       ..accountName = 'Account Name'
       ..accountNumber = '0123849688'
@@ -61,7 +71,8 @@ final createPeople = FutureProvider((ref) async {
       ..lastname = 'Hashim'
       ..houseAddress = 'Wuse, Abuja'
       ..phoneNumber = '08159730537'
-      ..institutionName = 'Afe Babalola University'
+      ..institutionName =
+          univesities[Random.secure().nextInt(univesities.length)]
       ..institutionID = 'FC/21C/10200'
       ..nokAddress = 'Amina close'
       ..staffType = AddHocStaffType.values[Random.secure().nextInt(2)]
@@ -149,17 +160,19 @@ class _PeopleView extends ConsumerWidget {
                                           onPressed: () async {
                                             var staffToBeDeleted = <Id>[];
                                             for (var id in selectedIndexes) {
-                                              var temp = id - 1;
+                                              var tdb = staff.firstWhere(
+                                                  (element) =>
+                                                      element.id == id);
                                               nameToBeDeleted.add(
-                                                  "${staff[temp].firstname} ${staff[temp].lastname}");
-                                              idToBeDeleted.add(staff[temp]
-                                                  .staffID
-                                                  .toString());
+                                                  "${tdb.firstname} ${tdb.lastname}");
+                                              idToBeDeleted
+                                                  .add(tdb.id.toString());
 
-                                              staffToBeDeleted
-                                                  .add(staff[temp].id);
+                                              staffToBeDeleted.add(id);
+                                              debugPrint(
+                                                  "Staff id to be deleted is: $id");
                                             }
-
+                                            // return;
                                             ref.watch(
                                                 deleteStaff(staffToBeDeleted));
                                             Navigator.of(context).pop();
@@ -227,11 +240,20 @@ class _PeopleView extends ConsumerWidget {
               selectionMode: SelectionMode.multiple,
               controller: controller,
               onCellTap: (cell) {
-                if (cell.rowColumnIndex.columnIndex == 2) {
-                  controller.selectedIndex = -1;
+                debugPrint(
+                    'rowIndex is ${cell.rowColumnIndex.rowIndex.toString()}');
+                // print(
+                // 'controller selectedIndex is: ${controller.selectedIndex}');
+                if (cell.rowColumnIndex.columnIndex == 3 &&
+                    cell.rowColumnIndex.rowIndex != 0) {
+                  // controller.selectedIndex = cell.rowColumnIndex.rowIndex - 1;
+                  // but the ID is not unique....so we need to add something else
+                  controller.selectedIndex = cell.rowColumnIndex.rowIndex - 1;
+                  var id = controller.selectedRow!.getCells()[0].value;
                   Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => AddHocInfoView(
-                            staff: staff[cell.rowColumnIndex.rowIndex - 1],
+                            staff:
+                                staff.firstWhere((element) => element.id == id),
                           )));
                 }
               },
@@ -239,9 +261,10 @@ class _PeopleView extends ConsumerWidget {
                 if (controller.selectedIndex == -1) {
                   selectedIndexes = [];
                 } else {
+                  debugPrint('seleted index is ${controller.selectedIndex}');
                   var emptyList = <int>[];
                   for (var item in controller.selectedRows) {
-                    emptyList.add(int.parse(item.getCells()[0].value));
+                    emptyList.add(item.getCells()[0].value);
                   }
                   selectedIndexes = emptyList;
                 }
@@ -253,7 +276,11 @@ class _PeopleView extends ConsumerWidget {
               source: _PeopleDataSource(staff, (id) async {}),
               columns: [
                 GridColumn(
-                    columnName: 'id', label: const Center(child: Text('ID'))),
+                    columnName: 'uniqueID',
+                    label: const Center(child: Text('s/n'))),
+                GridColumn(
+                    columnName: 'id',
+                    label: const Center(child: Text('Tag ID'))),
                 GridColumn(
                     columnName: 'firstname',
                     label: const Center(child: Text('First Name'))),
@@ -294,6 +321,7 @@ class _PeopleDataSource extends DataGridSource {
   _PeopleDataSource(List<AddHocStaff> staff, this.deletePerson) {
     data = staff
         .map((person) => DataGridRow(cells: [
+              DataGridCell(columnName: 'uniqueID', value: person.id),
               DataGridCell(columnName: 'id', value: person.staffID),
               DataGridCell(columnName: 'firstname', value: person.firstname),
               DataGridCell(columnName: 'lastname', value: person.lastname),
@@ -338,8 +366,8 @@ class _PeopleDataSource extends DataGridSource {
   int compare(DataGridRow? a, DataGridRow? b, SortColumnDetails sortColumn) {
     switch (sortColumn.name) {
       case 'id':
-        var aID = int.parse(a?.getCells()[0].value);
-        var bID = int.parse(b?.getCells()[0].value);
+        var aID = int.parse(a?.getCells()[1].value);
+        var bID = int.parse(b?.getCells()[1].value);
         var sign = aID > bID
             ? 1
             : aID < bID

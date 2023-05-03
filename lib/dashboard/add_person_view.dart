@@ -1,4 +1,5 @@
 import 'package:babaari/forms/current_form_view.dart';
+import 'package:babaari/helpers/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_toggle_tab/flutter_toggle_tab.dart';
@@ -99,12 +100,12 @@ class FormControllerView extends HookConsumerWidget {
                                       ref.watch(corpersList.notifier).state =
                                           null;
                                       ref.watch(formToUse.notifier).state =
-                                          FormModes.siwes;
+                                          AddHocStaffType.siwes;
                                     } else {
                                       ref.watch(siwesList.notifier).state =
                                           null;
                                       ref.watch(formToUse.notifier).state =
-                                          FormModes.corpers;
+                                          AddHocStaffType.corper;
                                     }
                                     Navigator.of(context).pop();
                                   },
