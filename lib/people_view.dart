@@ -129,6 +129,39 @@ class _PeopleView extends ConsumerWidget {
               ButtonBar(
                 children: [
                   TextButton(
+                      child: const Text(
+                        "Print",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                      onPressed: () async {
+                        if (selectedIndexes.isEmpty) {
+                          await showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                    title: const Text("Nothing selected!"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                          child: const Text("OK"))
+                                    ],
+                                  ));
+                          return;
+                        } else {
+                          List<AddHocStaff> toPrint = [];
+                          for (var index in selectedIndexes) {
+                            toPrint.add(staff
+                                .firstWhere((element) => element.id == index));
+                          }
+
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return MultiPrintDailogWidget(staff: toPrint);
+                          }));
+                        }
+                      }),
+                  TextButton(
                       onPressed: () async {
                         if (selectedIndexes.isEmpty) {
                           await showDialog(

@@ -1,6 +1,10 @@
+import 'package:babaari/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../models/adhocstaff.dart';
+
+part 'view_providers.g.dart';
 
 final List<String> labels = [
   'First name',
@@ -78,3 +82,39 @@ final courseViewProvider =
     StateProvider.family.autoDispose<String, AddHocStaff>(
   (ref, staff) => staff.courseOfStudy!,
 );
+
+@riverpod
+class MultiPrint extends _$MultiPrint {
+  @override
+  List<List<PrintOptionsCorper>> build() {
+    return [[]];
+  }
+
+  addItem(PrintOptionsCorper item, int personIndex) {
+    state[personIndex] = [...state[personIndex], item];
+    state = [...state];
+  }
+
+  removeItem(PrintOptionsCorper item, int personindex) {
+    state[personindex].remove(item);
+    state = [...state];
+  }
+}
+
+@riverpod
+class MultiPrintSiwes extends _$MultiPrintSiwes {
+  @override
+  List<List<PrintOptonsSiwes>> build() {
+    return [[]];
+  }
+
+  addItem(PrintOptonsSiwes item, int personIndex) {
+    state[personIndex] = [...state[personIndex], item];
+    state = [...state];
+  }
+
+  removeItem(PrintOptonsSiwes item, int personindex) {
+    state[personindex].remove(item);
+    state = [...state];
+  }
+}

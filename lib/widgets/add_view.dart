@@ -118,7 +118,10 @@ class _InfoView extends ConsumerWidget {
               Row(
                 children: [
                   Expanded(
-                      child: DropdownButton<int>(
+                      child: DropdownButtonFormField<int>(
+                          decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30))),
                           value: ref.watch(_selectedDpt),
                           hint: const Text("Select Department"),
                           items: departments
@@ -133,15 +136,18 @@ class _InfoView extends ConsumerWidget {
                                     newSelected
                                 : null;
                           })),
-                  Expanded(
-                      child:
-                          Text(departments[ref.watch(_selectedDpt)].name ?? ""))
                 ],
               ),
               ...List.generate(
                   departments[ref.watch(_selectedDpt)].units?.length ?? 0,
-                  (index) => Text(
-                      departments[ref.watch(_selectedDpt)].units?[index] ?? ""))
+                  (index) => Card(
+                        child: ListTile(
+                          subtitle: Text("unit: ${index + 1}"),
+                          title: Text(departments[ref.watch(_selectedDpt)]
+                                  .units?[index] ??
+                              ""),
+                        ),
+                      ))
             ],
           );
         },

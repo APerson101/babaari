@@ -33,6 +33,7 @@ dependencies:
   intl: ^0.18.0
   csv: ^5.0.1
   gap: ^2.0.1
+  riverpod_annotation: ^1.2.1
 dependency_overrides:
   archive: 3.3.0
 dev_dependencies:
@@ -41,6 +42,7 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   isar_generator: ^3.0.5
   build_runner: ^2.3.3
+  riverpod_generator: ^1.1.1
 
 flutter:
   uses-material-design: true

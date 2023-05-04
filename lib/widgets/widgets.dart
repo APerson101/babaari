@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:babaari/helpers/database.dart';
+import 'package:babaari/models/adhocstaff.dart';
+import 'package:babaari/widgets/printing_types.dart';
 import 'package:babaari/widgets/search_result.dart';
+import 'package:babaari/widgets/view_providers.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
+import 'package:printing/printing.dart';
 
 import '../models/department.dart';
 
@@ -99,7 +106,10 @@ class EditableLabel extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     if (isEditing) {
       if (label == 'Department') {
-        return DropdownButton<String>(
+        return DropdownButtonFormField<String>(
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30))),
             value: ref.watch(userDepartment),
             items: departments!.map((e) {
               return DropdownMenuItem(
@@ -125,7 +135,10 @@ class EditableLabel extends ConsumerWidget {
         var units = departments!
             .firstWhere((el) => el.name == ref.watch(userDepartment))
             .units;
-        return DropdownButton(
+        return DropdownButtonFormField(
+            decoration: InputDecoration(
+                border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30))),
             value: ref.watch(userUnit),
             items: units!.map((e) {
               return DropdownMenuItem(
@@ -203,11 +216,11 @@ class EditableLabel extends ConsumerWidget {
         );
       }
     } else {
-      return Row(
-        children: [
-          Text('$label: '),
-          Text(data ?? ""),
-        ],
+      return Card(
+        child: ListTile(
+          subtitle: Text(label),
+          title: Text(data ?? ""),
+        ),
       );
     }
   }
@@ -215,3 +228,167 @@ class EditableLabel extends ConsumerWidget {
 
 final userDepartment = StateProvider.autoDispose((ref) => '');
 final userUnit = StateProvider.autoDispose((ref) => "");
+
+class MultiPrintDailogWidget extends ConsumerWidget {
+  const MultiPrintDailogWidget({super.key, required this.staff});
+  final List<AddHocStaff> staff;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    var corpers =
+        staff.where((d) => d.staffType == AddHocStaffType.corper).toList();
+    var intern =
+        staff.where((d) => d.staffType == AddHocStaffType.siwes).toList();
+    var corperWatch = ref.watch(multiPrintProvider);
+    var siwesWatch = ref.watch(multiPrintSiwesProvider);
+    return Scaffold(
+      appBar: AppBar(
+          centerTitle: true,
+          title: const Text("print Details"),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  var pth = await GetIt.I<PrinterDoc>().generateMutliPrint(
+                      corpers: corpers,
+                      options: ref.read(multiPrintProvider),
+                      intern: intern,
+                      internOptions: ref.read(multiPrintSiwesProvider));
+                  final pdf = File(pth);
+                  await Printing.layoutPdf(onLayout: (_) => pdf.readAsBytes());
+                },
+                child:
+                    const Text("print", style: TextStyle(color: Colors.white)))
+          ]),
+      body: Center(
+        child: Column(children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: const [
+                Expanded(child: Divider()),
+                Text("Corpers"),
+                Expanded(child: Divider()),
+              ],
+            ),
+          ),
+          ...corpers.map((cor) {
+            var corperDets = corperWatch[corpers.indexOf(cor)];
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                  child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${cor.firstname!} ${cor.lastname!}'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ...PrintOptionsCorper.values.map((e) {
+                    return Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: corperDets.contains(e)
+                                    ? Colors.green
+                                    : Colors.black,
+                                width: 3),
+                            borderRadius: BorderRadius.circular(30)),
+                        child: ListTile(
+                          title: Text(describeEnum(e)),
+                          trailing: corperDets.contains(e)
+                              ? const Icon(Icons.remove)
+                              : const Icon(Icons.check),
+                          onTap: () {
+                            corperDets.contains(e)
+                                ? ref
+                                    .watch(multiPrintProvider.notifier)
+                                    .removeItem(e, corpers.indexOf(cor))
+                                : ref
+                                    .watch(multiPrintProvider.notifier)
+                                    .addItem(e, corpers.indexOf(cor));
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList()
+                ],
+              )),
+            );
+          }).toList(),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Row(
+              children: const [
+                Expanded(child: Divider()),
+                Text("Siwes"),
+                Expanded(child: Divider()),
+              ],
+            ),
+          ),
+          ...intern.map((intr) {
+            var intDets = siwesWatch[intern.indexOf(intr)];
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                  child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${intr.firstname!} ${intr.lastname!}'),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  ...PrintOptonsSiwes.values.map((e) {
+                    return Expanded(
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                                color: intDets.contains(e)
+                                    ? Colors.green
+                                    : Colors.black,
+                                width: 3),
+                            borderRadius: BorderRadius.circular(30)),
+                        child: ListTile(
+                          title: Text(describeEnum(e)),
+                          trailing: intDets.contains(e)
+                              ? const Icon(Icons.remove)
+                              : const Icon(Icons.check),
+                          onTap: () {
+                            intDets.contains(e)
+                                ? ref
+                                    .watch(multiPrintSiwesProvider.notifier)
+                                    .removeItem(e, intern.indexOf(intr))
+                                : ref
+                                    .watch(multiPrintSiwesProvider.notifier)
+                                    .addItem(e, intern.indexOf(intr));
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList()
+                ],
+              )),
+            );
+          }).toList(),
+        ]),
+      ),
+    );
+  }
+}
+
+enum PrintOptionsCorper {
+  acceptance,
+  rejection,
+  monthlyclearance,
+  finalclearance,
+  departmentPosting
+}
+
+enum PrintOptonsSiwes {
+  acceptance,
+  rejection,
+  finalClearance,
+  departmentPosting
+}

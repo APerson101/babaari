@@ -3,6 +3,7 @@ import 'package:babaari/helpers/database.dart';
 import 'package:babaari/widgets/view_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../dashboard/dashboard_providers.dart';
 import '../models/adhocstaff.dart';
@@ -34,7 +35,8 @@ class AddHocForm extends ConsumerWidget {
         return u == -1 ? 0 : u;
       });
       final selectedGender = StateProvider((ref) => addHocStaff.gender ?? "M");
-
+      final startDate = StateProvider((ref) => addHocStaff.startDate);
+      final endDate = StateProvider((ref) => addHocStaff.endDate);
       return SingleChildScrollView(
         child: Column(
           children: [
@@ -64,17 +66,19 @@ class AddHocForm extends ConsumerWidget {
                 ),
               ),
             ]),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: EditableLabel(
-                  onChanged: (callUp) {
-                    addHocStaff.callUpNumber = callUp;
-                  },
-                  isEditing: true,
-                  controller: callUpController
-                    ..text = addHocStaff.callUpNumber ?? "",
-                  label: 'Call up Number'),
-            ),
+            ref.watch(selectedTab) == 0
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: EditableLabel(
+                        onChanged: (callUp) {
+                          addHocStaff.callUpNumber = callUp;
+                        },
+                        isEditing: true,
+                        controller: callUpController
+                          ..text = addHocStaff.callUpNumber ?? "",
+                        label: 'Call up Number'),
+                  )
+                : const SizedBox(),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: DropdownButtonFormField(
@@ -92,12 +96,6 @@ class AddHocForm extends ConsumerWidget {
                   }),
             ),
             ...List.generate(controllers.length - 2, (index) {
-              var num = index + 2;
-              var label = index == 4
-                  ? ref.watch(selectedTab) == 0
-                      ? "State Code"
-                      : "School ID"
-                  : labels[num];
               Function(String) changed = (txt) {};
               switch (index) {
                 case 0:
@@ -176,7 +174,10 @@ class AddHocForm extends ConsumerWidget {
                   break;
               }
               if (index == 8) {
-                return DropdownButton(
+                return DropdownButtonFormField(
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30))),
                     value: ref.watch(selectedDpt),
                     items: data
                         .map((e) => DropdownMenuItem(
@@ -192,7 +193,10 @@ class AddHocForm extends ConsumerWidget {
               }
               if (index == 9) {
                 var department = data[ref.watch(selectedDpt)];
-                return DropdownButton(
+                return DropdownButtonFormField(
+                    decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30))),
                     value: ref.watch(selectedUnit),
                     items: department.units!
                         .map((e) => DropdownMenuItem(
@@ -210,37 +214,56 @@ class AddHocForm extends ConsumerWidget {
               }
 
               if (index == 11) {
-                return ElevatedButton(
-                    onPressed: () async {
-                      var selectedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime(2023),
-                          firstDate: DateTime(2023),
-                          lastDate: DateTime(2023));
-                      if (selectedDate != null) {
-                        controllers[13].text = selectedDate.toString();
-                        addHocStaff.startDate = selectedDate;
-                      }
-                    },
-                    child: const Text("Start Date"));
+                return Card(
+                  child: ListTile(
+                    trailing: TextButton(
+                        onPressed: () async {
+                          var selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate:
+                                  addHocStaff.startDate ?? DateTime.now(),
+                              firstDate: DateTime(2023),
+                              lastDate: DateTime(DateTime.now().year + 1));
+                          if (selectedDate != null) {
+                            controllers[13].text = selectedDate.toString();
+                            addHocStaff.startDate = selectedDate;
+                            ref.watch(startDate.notifier).state = selectedDate;
+                          }
+                        },
+                        child: const Text('change')),
+                    subtitle: const Text("Start date"),
+                    title: Text(ref.watch(startDate) == null
+                        ? "Enter Start Date"
+                        : DateFormat.yMMMMd().format(addHocStaff.startDate!)),
+                  ),
+                );
               }
 
               if (index == 12) {
-                return ElevatedButton(
-                    onPressed: () async {
-                      var selectedDate = await showDatePicker(
-                          context: context,
-                          initialDate: DateTime.tryParse(
-                                  addHocStaff.endDate.toString()) ??
-                              DateTime.now(),
-                          firstDate: DateTime(2023),
-                          lastDate: DateTime(DateTime.now().year + 3));
-                      if (selectedDate != null) {
-                        controllers[14].text = selectedDate.toString();
-                        addHocStaff.endDate = selectedDate;
-                      }
-                    },
-                    child: const Text("End Date"));
+                return Card(
+                  child: ListTile(
+                    subtitle: const Text("End date"),
+                    title: Text(ref.watch(endDate) == null
+                        ? "Enter End Date"
+                        : DateFormat.yMMMMd().format(addHocStaff.endDate!)),
+                    trailing: TextButton(
+                        onPressed: () async {
+                          var selectedDate = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.tryParse(
+                                      addHocStaff.endDate.toString()) ??
+                                  DateTime.now(),
+                              firstDate: DateTime(2023),
+                              lastDate: DateTime(DateTime.now().year + 3));
+                          if (selectedDate != null) {
+                            controllers[14].text = selectedDate.toString();
+                            addHocStaff.endDate = selectedDate;
+                            ref.watch(endDate.notifier).state = selectedDate;
+                          }
+                        },
+                        child: const Text("Change")),
+                  ),
+                );
               } else {
                 var num = index + 2;
                 var label = index == 4

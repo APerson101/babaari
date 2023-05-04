@@ -1,6 +1,8 @@
 import 'dart:io';
 
 import 'package:babaari/models/adhocstaff.dart';
+import 'package:babaari/widgets/widgets.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
@@ -23,16 +25,16 @@ class PrinterDoc {
   }
 
   generateStatusNysc(
-      {required AddHocStaff person, required String type}) async {
+      {required PdfDocument document,
+      required AddHocStaff person,
+      required String type}) {
     try {
       PdfFont subHeadingFont = PdfStandardFont(PdfFontFamily.helvetica, 12);
 
       var todayDate = DateFormat.yMMMMd().format(DateTime.now());
       var fileName = "NITDA/HQ/NYSC/016/VOL.XIII";
-      PdfDocument document = PdfDocument();
-      document.pageSettings.orientation = PdfPageOrientation.portrait;
-      document.pageSettings.margins.all = 30;
       PdfPage page = document.pages.add();
+
       PdfGraphics graphics = page.graphics;
 
       PdfTextElement element =
@@ -131,18 +133,48 @@ class PrinterDoc {
       result = element.draw(
           page: page,
           bounds: Rect.fromLTWH(10, result.bounds.bottom + 5, 0, 0))!;
-      var file = (await File(
-              '${(await getApplicationDocumentsDirectory()).path}/generated.pdf')
-          .writeAsBytes((await document.save())));
-      return file.path;
     } catch (e) {
-      print(e.toString());
+      debugPrint(e.toString());
       return null;
     }
+  }
 
-// PdfDocument(inputBytes: File('input.pdf').readAsBytesSync())
-//         .pages[0]
-//         .createTemplate();
+  savePdfDocumentAndGetPath(PdfDocument document) async {
+    var file = (await File(
+            '${(await getApplicationDocumentsDirectory()).path}/generated.pdf')
+        .writeAsBytes((await document.save())));
+    return file.path;
+  }
+
+  Future<String> generateMutliPrint(
+      {required List<AddHocStaff> corpers,
+      required List<List<PrintOptionsCorper>> options,
+      required List<AddHocStaff> intern,
+      required List<List<PrintOptonsSiwes>> internOptions}) async {
+    PdfDocument document = PdfDocument();
+    document.pageSettings.orientation = PdfPageOrientation.portrait;
+    document.pageSettings.margins.all = 30;
+    for (var option in options) {
+      if (option.contains(PrintOptionsCorper.acceptance)) {
+        generateStatusNysc(
+            document: document,
+            person: corpers[options.indexOf(option)],
+            type: 'acceptance');
+      }
+      if (option.contains(PrintOptionsCorper.rejection)) {
+        generateStatusNysc(
+            document: document,
+            person: corpers[options.indexOf(option)],
+            type: 'rejection');
+      }
+    }
+
+    for (var option in internOptions) {
+      debugPrint("I HAVENT RECEIVED THE NECESSARY DETAILS YET");
+    }
+
+    var path = await savePdfDocumentAndGetPath(document);
+    return path;
   }
 }
 

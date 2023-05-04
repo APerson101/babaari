@@ -9,6 +9,7 @@ import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
+import 'package:syncfusion_flutter_pdf/pdf.dart';
 
 class PrintView extends ConsumerWidget {
   const PrintView({super.key, this.person});
@@ -189,7 +190,12 @@ class _NewPrint extends ConsumerWidget {
                         selected == 'rejection' &&
                             ref.watch(_selectedType) ==
                                 AddHocStaffType.corper) {
-                      file = await GetIt.I<PrinterDoc>().generateStatusNysc(
+                      PdfDocument document = PdfDocument();
+                      document.pageSettings.orientation =
+                          PdfPageOrientation.portrait;
+                      document.pageSettings.margins.all = 30;
+                      GetIt.I<PrinterDoc>().generateStatusNysc(
+                          document: document,
                           person: AddHocStaff()
                             ..firstname = nameController.text.split(' ')[0]
                             ..lastname = nameController.text.split(' ')[1]
@@ -198,6 +204,9 @@ class _NewPrint extends ConsumerWidget {
                             ..gender = ref.watch(_selectedGender)
                             ..courseOfStudy = courseController.text,
                           type: selected);
+
+                      file = await GetIt.I<PrinterDoc>()
+                          .savePdfDocumentAndGetPath(document);
                     }
                     if (file != null) {
                       final docx = File(file);
@@ -228,53 +237,127 @@ class _ExistingPrint extends ConsumerWidget {
         children: [
           Positioned(
               left: 0,
-              child: Column(
+              top: 0,
+              child: Row(
                 children: [
                   ElevatedButton(
                       onPressed: () async {
+                        PdfDocument document = PdfDocument();
+                        document.pageSettings.orientation =
+                            PdfPageOrientation.portrait;
+                        document.pageSettings.margins.all = 30;
+                        GetIt.I<PrinterDoc>().generateStatusNysc(
+                            person: person,
+                            type: 'acceptance',
+                            document: document);
                         var file = await GetIt.I<PrinterDoc>()
-                            .generateStatusNysc(
-                                person: person, type: 'acceptance');
+                            .savePdfDocumentAndGetPath(document);
                         final docx = File(file);
                         await Printing.layoutPdf(
                             onLayout: (_) => docx.readAsBytes());
                       },
-                      child: const Text('Print Acceptance Letter')),
+                      child: const Text('Acceptance\nLetter')),
                   ElevatedButton(
                       onPressed: () async {
+                        PdfDocument document = PdfDocument();
+                        document.pageSettings.orientation =
+                            PdfPageOrientation.portrait;
+                        document.pageSettings.margins.all = 30;
+                        GetIt.I<PrinterDoc>().generateStatusNysc(
+                            person: person,
+                            type: 'rejection',
+                            document: document);
                         var file = await GetIt.I<PrinterDoc>()
-                            .generateStatusNysc(
-                                person: person, type: 'rejection');
+                            .savePdfDocumentAndGetPath(document);
                         final docx = File(file);
                         await Printing.layoutPdf(
                             onLayout: (_) => docx.readAsBytes());
                       },
-                      child: const Text('Print Rejection Letter')),
+                      child: const Text('Rejection\nLetter')),
                   isCorper
                       ? ElevatedButton(
                           onPressed: () {},
-                          child: const Text('Print Final Clearance Letter'))
+                          child: const Text('Final Clearance Letter'))
                       : ElevatedButton(
                           onPressed: () {},
-                          child: const Text("Print SIWES Completion Letter")),
+                          child: const Text("SIWES Completion Letter")),
                   isCorper
                       ? ElevatedButton(
                           onPressed: () {},
-                          child: const Text("Print Monthly Clearance"))
+                          child: const Text("Monthly Clearance"))
                       : const Gap(1)
                 ],
               )),
           Positioned(
               right: 0,
+              left: 0,
+              top: 50,
+              height: MediaQuery.of(context).size.height * .7,
               child: Column(
                 children: [
-                  Text('${person.firstname} ${person.lastname}'),
-                  Text('${person.department}: ${person.unit}'),
-                  Text(
-                      'START DATE: ${DateFormat.yMd().format(person.startDate!)}'),
-                  Text(
-                      'END DATE:  ${DateFormat.yMd().format(person.endDate!)}'),
-                  Text('${person.institutionName} '),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                        child: ListTile(
+                            title: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text('${person.firstname} ${person.lastname}'),
+                    ))),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                          title: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('${person.department}: ${person.unit}'),
+                      )),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                        subtitle: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Start Date"),
+                          ),
+                        ),
+                        title: Text(DateFormat.yMd().format(person.startDate!)),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                        subtitle: const Padding(
+                          padding: EdgeInsets.all(8.0),
+                          child: Text("End Date"),
+                        ),
+                        title: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text(DateFormat.yMd().format(person.endDate!)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Card(
+                      child: ListTile(
+                          subtitle: const Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text("Institution"),
+                          ),
+                          title: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('${person.institutionName}'),
+                          )),
+                    ),
+                  ),
                 ],
               )),
         ],

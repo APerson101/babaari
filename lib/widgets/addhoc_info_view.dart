@@ -68,10 +68,9 @@ class _StaffInfo extends ConsumerWidget {
   final AddHocStaff staff;
 
   final List<TextEditingController> _controllers =
-      List.generate(18, (index) => TextEditingController());
+      List.generate(19, (index) => TextEditingController());
   final _key = GlobalKey<FormState>();
   final db = GetIt.I<DatabaseHelper>();
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return ref.watch(allDepartments).when(data: (departments) {
@@ -82,6 +81,7 @@ class _StaffInfo extends ConsumerWidget {
       var endDate = ref.watch(endDateViewProvider);
       endDate ??= staff.endDate;
       endDate ??= DateTime.now();
+      var gender = StateProvider((ref) => staff.gender);
 
       ref.listen(saveButtonPressed, (pr, nx) async {
         if (pr != nx && nx) {
@@ -110,6 +110,7 @@ class _StaffInfo extends ConsumerWidget {
           staff.nokName = _controllers[15].text;
           staff.nokAddress = _controllers[16].text;
           staff.nokNumber = _controllers[17].text;
+          staff.gender = ref.read(gender);
           await db.updateStaff(staff);
 
           //invalidate suggestions
@@ -156,11 +157,48 @@ class _StaffInfo extends ConsumerWidget {
                         controller: _controllers[1]..text = staff.lastname!,
                       ))
                     ])),
-                EditableLabel(
-                  label: labels[2],
-                  data: staff.phoneNumber!,
-                  isEditing: editing,
-                  controller: _controllers[2]..text = staff.phoneNumber!,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      editing
+                          ? Expanded(
+                              child: DropdownButtonFormField(
+                              decoration: InputDecoration(
+                                  border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(30))),
+                              value: ref.watch(gender),
+                              onChanged: (selected) {
+                                if (selected != null) {
+                                  ref.watch(gender.notifier).state = selected;
+                                }
+                              },
+                              items: const [
+                                DropdownMenuItem(
+                                    value: "M", child: Text("Male")),
+                                DropdownMenuItem(
+                                    value: 'F', child: Text("Female")),
+                              ],
+                            ))
+                          : Expanded(
+                              child: Card(
+                                  child: ListTile(
+                                      subtitle: const Text("Gender"),
+                                      title:
+                                          Text(staff.gender ?? "No gender"))),
+                            ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: EditableLabel(
+                          label: labels[2],
+                          data: staff.phoneNumber!,
+                          isEditing: editing,
+                          controller: _controllers[2]
+                            ..text = staff.phoneNumber!,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 EditableLabel(
@@ -196,13 +234,38 @@ class _StaffInfo extends ConsumerWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                EditableLabel(
-                  label: staff.staffType == AddHocStaffType.corper
-                      ? 'State Code'
-                      : "School ID",
-                  data: staff.institutionID!,
-                  isEditing: editing,
-                  controller: _controllers[6]..text = staff.institutionID!,
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    children: [
+                      staff.staffType == AddHocStaffType.corper
+                          ? Expanded(
+                              child: EditableLabel(
+                                label: 'Call Up Number',
+                                data: staff.callUpNumber!,
+                                isEditing: editing,
+                                controller: _controllers[18]
+                                  ..text = staff.callUpNumber!,
+                              ),
+                            )
+                          : const SizedBox(),
+                      SizedBox(
+                          width: staff.staffType == AddHocStaffType.corper
+                              ? 10
+                              : 0),
+                      Expanded(
+                        child: EditableLabel(
+                          label: staff.staffType == AddHocStaffType.corper
+                              ? 'State Code'
+                              : "School ID",
+                          data: staff.institutionID!,
+                          isEditing: editing,
+                          controller: _controllers[6]
+                            ..text = staff.institutionID!,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 EditableLabel(
@@ -291,10 +354,12 @@ class _StaffInfo extends ConsumerWidget {
                               trailing:
                                   Text(DateFormat.yMd().format(startDate)),
                             )
-                          : ListTile(
-                              title: const Text("Start Date"),
-                              trailing:
-                                  Text(DateFormat.yMd().format(startDate)))),
+                          : Card(
+                              child: ListTile(
+                                  subtitle: const Text("Start Date"),
+                                  title:
+                                      Text(DateFormat.yMd().format(startDate))),
+                            )),
                   Expanded(
                       child: editing
                           ? ListTile(
@@ -315,9 +380,11 @@ class _StaffInfo extends ConsumerWidget {
                                   child: const Text("Select End Date")),
                               trailing: Text(DateFormat.yMd().format(endDate)),
                             )
-                          : ListTile(
-                              title: const Text("End Date"),
-                              trailing: Text(DateFormat.yMd().format(endDate)),
+                          : Card(
+                              child: ListTile(
+                                subtitle: const Text("End Date"),
+                                title: Text(DateFormat.yMd().format(endDate)),
+                              ),
                             ))
                 ]),
                 const SizedBox(height: 10),
@@ -360,7 +427,7 @@ class _StaffInfo extends ConsumerWidget {
         ),
       );
     }, error: (Object error, StackTrace stackTrace) {
-      return const Center(child: Text("ERRORO"));
+      return const Center(child: Text("ERROR"));
     }, loading: () {
       return const Center(child: CircularProgressIndicator.adaptive());
     });
