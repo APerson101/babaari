@@ -18,6 +18,7 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'activity/activity_providers.dart';
 import 'dashboard/dashboard_providers.dart';
+import 'main_view.dart';
 import 'models/activity.dart';
 import 'models/adhocstaff.dart';
 import 'models/department.dart';
@@ -178,11 +179,11 @@ class MyApp extends ConsumerWidget {
       }
     });
 
-    // return MaterialApp(
-    //     // theme: ThemeData.dark(),
-    //     home: SafeArea(
-    //   child: MainView(),
-    // ));
+    return MaterialApp(
+        // theme: ThemeData.dark(),
+        home: SafeArea(
+      child: MainView(),
+    ));
     return MaterialApp(
         home: SafeArea(
       child: Scaffold(
