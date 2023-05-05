@@ -34,6 +34,7 @@ dependencies:
   csv: ^5.0.1
   gap: ^2.0.1
   riverpod_annotation: ^1.2.1
+  recase: ^4.1.0
 dependency_overrides:
   archive: 3.3.0
 dev_dependencies:
@@ -50,9 +51,8 @@ flutter:
   assets:
       - templates/
       - generated/
-
-  #   - images/a_dot_burr.jpeg
-  #   - images/a_dot_ham.jpeg
+      - assets/images/nitdalogo.png
+      # - images/nitdalogo.png
 
   # fonts:
   #   - family: Schyler

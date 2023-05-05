@@ -17,13 +17,18 @@ const DepartmentSchema = CollectionSchema(
   name: r'Department',
   id: -2990471549981954131,
   properties: {
-    r'name': PropertySchema(
+    r'fullName': PropertySchema(
       id: 0,
+      name: r'fullName',
+      type: IsarType.string,
+    ),
+    r'name': PropertySchema(
+      id: 1,
       name: r'name',
       type: IsarType.string,
     ),
     r'units': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'units',
       type: IsarType.stringList,
     )
@@ -48,6 +53,12 @@ int _departmentEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.fullName;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.name;
     if (value != null) {
@@ -75,8 +86,9 @@ void _departmentSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.name);
-  writer.writeStringList(offsets[1], object.units);
+  writer.writeString(offsets[0], object.fullName);
+  writer.writeString(offsets[1], object.name);
+  writer.writeStringList(offsets[2], object.units);
 }
 
 Department _departmentDeserialize(
@@ -86,9 +98,10 @@ Department _departmentDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Department();
+  object.fullName = reader.readStringOrNull(offsets[0]);
   object.id = id;
-  object.name = reader.readStringOrNull(offsets[0]);
-  object.units = reader.readStringList(offsets[1]);
+  object.name = reader.readStringOrNull(offsets[1]);
+  object.units = reader.readStringList(offsets[2]);
   return object;
 }
 
@@ -102,6 +115,8 @@ P _departmentDeserializeProp<P>(
     case 0:
       return (reader.readStringOrNull(offset)) as P;
     case 1:
+      return (reader.readStringOrNull(offset)) as P;
+    case 2:
       return (reader.readStringList(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -199,6 +214,157 @@ extension DepartmentQueryWhere
 
 extension DepartmentQueryFilter
     on QueryBuilder<Department, Department, QFilterCondition> {
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'fullName',
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition>
+      fullNameIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'fullName',
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition>
+      fullNameGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'fullName',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition>
+      fullNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'fullName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition> fullNameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'fullName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition>
+      fullNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'fullName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterFilterCondition>
+      fullNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'fullName',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Department, Department, QAfterFilterCondition> idEqualTo(
       Id value) {
     return QueryBuilder.apply(this, (query) {
@@ -647,6 +813,18 @@ extension DepartmentQueryLinks
 
 extension DepartmentQuerySortBy
     on QueryBuilder<Department, Department, QSortBy> {
+  QueryBuilder<Department, Department, QAfterSortBy> sortByFullName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterSortBy> sortByFullNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullName', Sort.desc);
+    });
+  }
+
   QueryBuilder<Department, Department, QAfterSortBy> sortByName() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.asc);
@@ -662,6 +840,18 @@ extension DepartmentQuerySortBy
 
 extension DepartmentQuerySortThenBy
     on QueryBuilder<Department, Department, QSortThenBy> {
+  QueryBuilder<Department, Department, QAfterSortBy> thenByFullName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Department, Department, QAfterSortBy> thenByFullNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'fullName', Sort.desc);
+    });
+  }
+
   QueryBuilder<Department, Department, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -689,6 +879,13 @@ extension DepartmentQuerySortThenBy
 
 extension DepartmentQueryWhereDistinct
     on QueryBuilder<Department, Department, QDistinct> {
+  QueryBuilder<Department, Department, QDistinct> distinctByFullName(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'fullName', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Department, Department, QDistinct> distinctByName(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -708,6 +905,12 @@ extension DepartmentQueryProperty
   QueryBuilder<Department, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Department, String?, QQueryOperations> fullNameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'fullName');
     });
   }
 

@@ -15,7 +15,7 @@ class CurrentFormView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     var indexToView = ref.watch(currentViewLocation);
     var form = ref.watch(formToUse);
-    var Outercontext = context;
+    var outercontext = context;
     return indexToView != null
         ? Stack(
             children: [
@@ -75,9 +75,9 @@ class CurrentFormView extends ConsumerWidget {
                                             Navigator.of(context).pop();
                                             await Future.delayed(const Duration(
                                                 milliseconds: 500));
-                                            if (Outercontext.mounted) {
+                                            if (outercontext.mounted) {
                                               await showDialog(
-                                                  context: Outercontext,
+                                                  context: outercontext,
                                                   builder: (context) {
                                                     return const SavingProgressView();
                                                   });
@@ -168,8 +168,6 @@ final saveProvider = FutureProvider.autoDispose((ref) async {
   await Future.delayed(const Duration(seconds: 2));
   var forms = ref.read(allForms);
   var db = GetIt.I<DatabaseHelper>();
-  for (var person in forms) {
-    print(person.toString());
-  }
+
   await db.saveForms(forms);
 });

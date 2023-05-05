@@ -246,11 +246,13 @@ class _PeopleView extends ConsumerWidget {
                         }
                         await Clipboard.setData(
                             ClipboardData(text: addDetails));
-                        ScaffoldMessenger.of(context).clearSnackBars();
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).clearSnackBars();
 
-                        ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text("Copied to clipboard!")));
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Copied to clipboard!")));
+                        }
                       },
                       child: const Text(
                         "copy account ",
@@ -275,12 +277,8 @@ class _PeopleView extends ConsumerWidget {
               onCellTap: (cell) {
                 debugPrint(
                     'rowIndex is ${cell.rowColumnIndex.rowIndex.toString()}');
-                // print(
-                // 'controller selectedIndex is: ${controller.selectedIndex}');
                 if (cell.rowColumnIndex.columnIndex == 3 &&
                     cell.rowColumnIndex.rowIndex != 0) {
-                  // controller.selectedIndex = cell.rowColumnIndex.rowIndex - 1;
-                  // but the ID is not unique....so we need to add something else
                   controller.selectedIndex = cell.rowColumnIndex.rowIndex - 1;
                   var id = controller.selectedRow!.getCells()[0].value;
                   Navigator.of(context).push(MaterialPageRoute(

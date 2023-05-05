@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:babaari/helpers/database.dart';
 import 'package:babaari/widgets/printing_types.dart';
+import 'package:docx_template/docx_template.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
@@ -16,7 +18,6 @@ import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
 import 'activity/activity_providers.dart';
 import 'dashboard/dashboard_providers.dart';
-import 'main_view.dart';
 import 'models/activity.dart';
 import 'models/adhocstaff.dart';
 import 'models/department.dart';
@@ -46,6 +47,22 @@ class MyApp extends ConsumerWidget {
     ref.watch(newPersonAdded);
     ref.watch(newDepartmentAdded);
     ref.watch(todayActivitesUpdater);
+    ref.listen(testDocxTemplate, (pc, nx) async {
+      if (nx) {
+        var nyscRejection =
+            await rootBundle.load('templates/nysc_rejection.docx');
+        var docx = await DocxTemplate.fromBytes(nyscRejection.buffer
+            .asUint8List(
+                nyscRejection.offsetInBytes, nyscRejection.lengthInBytes));
+        Content c = Content();
+        c.add(TextContent("name", "Abdulhadi"));
+        var d = await docx.generate(c);
+        var file = await File(
+                '${(await getApplicationDocumentsDirectory()).path}/generated.pdf')
+            .writeAsBytes(d!);
+        await Printing.layoutPdf(onLayout: (_) => file.readAsBytes());
+      }
+    });
     ref.listen(saveTemplate, (pr, nx) async {
       if (nx) {
         PdfFont subHeadingFont = PdfStandardFont(PdfFontFamily.helvetica, 12);
@@ -161,11 +178,11 @@ class MyApp extends ConsumerWidget {
       }
     });
 
-    return MaterialApp(
-        // theme: ThemeData.dark(),
-        home: SafeArea(
-      child: MainView(),
-    ));
+    // return MaterialApp(
+    //     // theme: ThemeData.dark(),
+    //     home: SafeArea(
+    //   child: MainView(),
+    // ));
     return MaterialApp(
         home: SafeArea(
       child: Scaffold(
@@ -197,11 +214,37 @@ class MyApp extends ConsumerWidget {
                 : Container(),
             ElevatedButton(
                 onPressed: () async {
-                  // print pdf doc
-                  final pdf = File(ref.watch(generatedPdfPath)!);
+                  ref.watch(testDocxTemplate.notifier).state = true;
+                },
+                child: const Text("test docx")),
+            ElevatedButton(
+                onPressed: () async {
+                  //
+                  PdfDocument document = PdfDocument();
+                  await GetIt.I<PrinterDoc>().generatePosting(
+                      from: "sample ",
+                      department: Department()
+                        ..fullName =
+                            "Information Technology Infrastructure Solution"
+                        ..name = 'ITIS'
+                        ..units = ['Software Unit'],
+                      to: "to",
+                      person: AddHocStaff()
+                        ..firstname = "Abdul-Hadi"
+                        ..lastname = "Hashim"
+                        ..staffType = AddHocStaffType.corper
+                        ..gender = "M"
+                        ..startDate = DateTime.now()
+                        ..endDate = DateTime.now()
+                        ..courseOfStudy = "Computer Engineering",
+                      document: document);
+                  var file = await GetIt.I<PrinterDoc>()
+                      .savePdfDocumentAndGetPath(document);
+                  //print file
+                  final pdf = File(file);
                   await Printing.layoutPdf(onLayout: (_) => pdf.readAsBytes());
                 },
-                child: const Text("Print")),
+                child: const Text("Test posting to dpt"))
           ]),
         ),
       ),
@@ -213,3 +256,4 @@ final saveTemplate = StateProvider.autoDispose((ref) => false);
 
 final generateDocx = StateProvider<String?>((ref) => null);
 final generatedPdfPath = StateProvider<String?>((ref) => null);
+final testDocxTemplate = StateProvider((ref) => false);

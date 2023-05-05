@@ -2,14 +2,19 @@ import 'dart:io';
 
 import 'package:babaari/helpers/database.dart';
 import 'package:babaari/models/adhocstaff.dart';
+import 'package:babaari/models/department.dart';
 import 'package:babaari/widgets/printing_types.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:get_it/get_it.dart';
 import 'package:intl/intl.dart';
+import 'package:isar/isar.dart';
 import 'package:printing/printing.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
+
+import '../dashboard/dashboard_providers.dart';
+import '../models/print_provider.dart';
 
 class PrintView extends ConsumerWidget {
   const PrintView({super.key, this.person});
@@ -28,196 +33,226 @@ class _NewPrint extends ConsumerWidget {
   final nameController = TextEditingController();
   final courseController = TextEditingController();
   final institutionController = TextEditingController();
+  final dptController = TextEditingController();
   final callUpController = TextEditingController();
   final _selectedGender = StateProvider((ref) => 'M');
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-        appBar: AppBar(),
-        body: Column(children: [
-          Row(children: [
-            RadioMenuButton(
-                value: AddHocStaffType.corper,
-                groupValue: ref.watch(_selectedType),
-                onChanged: (staff) {
-                  staff != null
-                      ? ref.watch(_selectedType.notifier).state = staff
-                      : null;
-                },
-                child: const Text("Corper")),
-            RadioMenuButton(
-                value: AddHocStaffType.siwes,
-                groupValue: ref.watch(_selectedType),
-                onChanged: (siwes) {
-                  siwes != null
-                      ? ref.watch(_selectedType.notifier).state = siwes
-                      : null;
-                },
-                child: const Text("Siwes"))
-          ]),
-          Column(
-            children: [
-              Row(
-                children: [
-                  RadioMenuButton(
-                      value: 'acceptance',
-                      groupValue: ref.watch(_corperPrintType),
-                      onChanged: (staff) {
-                        staff != null
-                            ? ref.watch(_corperPrintType.notifier).state =
-                                'acceptance'
-                            : null;
-                      },
-                      child: const Text("Acceptance Letter")),
-                  RadioMenuButton(
-                      value: 'posting',
-                      groupValue: ref.watch(_corperPrintType),
-                      onChanged: (siwes) {
-                        siwes != null
-                            ? ref.watch(_corperPrintType.notifier).state = siwes
-                            : null;
-                      },
-                      child: const Text("Department Posting")),
-                  RadioMenuButton(
-                      value: 'rejection',
-                      groupValue: ref.watch(_corperPrintType),
-                      onChanged: (rejection) {
-                        rejection != null
-                            ? ref.watch(_corperPrintType.notifier).state =
-                                rejection
-                            : null;
-                      },
-                      child: const Text("Rejection Letter")),
-                ],
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                controller: nameController,
-                validator: (name) {
-                  return name == null
-                      ? null
-                      : name.isNotEmpty
-                          ? null
-                          : "Enter valid name";
-                },
-                decoration: InputDecoration(
-                    labelText:
-                        ref.watch(_selectedType) == AddHocStaffType.corper
-                            ? "Enter corper's name"
-                            : 'Enter student name',
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30))),
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                controller: statecodeController,
-                validator: (name) {
-                  return name == null
-                      ? null
-                      : name.isNotEmpty
-                          ? null
-                          : "Enter valid ID";
-                },
-                decoration: InputDecoration(
-                    labelText:
-                        ref.watch(_selectedType) == AddHocStaffType.corper
-                            ? "Enter state code"
-                            : "Enter school ID number",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30))),
-              ),
-              ref.watch(_selectedType) == AddHocStaffType.corper
-                  ? TextFormField(
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      controller: callUpController,
-                      validator: (name) {
-                        return name == null
-                            ? null
-                            : name.isNotEmpty
-                                ? null
-                                : "Enter valid Call of number";
-                      },
-                      decoration: InputDecoration(
-                          labelText: "Enter call of number code",
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(30))),
-                    )
-                  : const SizedBox(),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                controller: courseController,
-                validator: (name) {
-                  return name == null
-                      ? null
-                      : name.isNotEmpty
-                          ? null
-                          : "Enter valid course";
-                },
-                decoration: InputDecoration(
-                    labelText: "Enter course of study",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30))),
-              ),
-              TextFormField(
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                controller: institutionController,
-                validator: (name) {
-                  return name == null
-                      ? null
-                      : name.isNotEmpty
-                          ? null
-                          : "Enter valid institution name";
-                },
-                decoration: InputDecoration(
-                    labelText: "Enter Institution name",
-                    border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(30))),
-              ),
-              DropdownButtonFormField(
-                  value: ref.watch(_selectedGender),
-                  items: const [
-                    DropdownMenuItem(value: "M", child: Text("Male")),
-                    DropdownMenuItem(value: "F", child: Text("Female")),
+    var alldpts = ref.watch(allDepartments);
+    return alldpts.when(data: (all) {
+      return Scaffold(
+          appBar: AppBar(),
+          body: Column(children: [
+            Row(children: [
+              RadioMenuButton(
+                  value: AddHocStaffType.corper,
+                  groupValue: ref.watch(_selectedType),
+                  onChanged: (staff) {
+                    staff != null
+                        ? ref.watch(_selectedType.notifier).state = staff
+                        : null;
+                  },
+                  child: const Text("Corper")),
+              RadioMenuButton(
+                  value: AddHocStaffType.siwes,
+                  groupValue: ref.watch(_selectedType),
+                  onChanged: (siwes) {
+                    siwes != null
+                        ? ref.watch(_selectedType.notifier).state = siwes
+                        : null;
+                  },
+                  child: const Text("Siwes"))
+            ]),
+            Column(
+              children: [
+                Row(
+                  children: [
+                    RadioMenuButton(
+                        value: 'acceptance',
+                        groupValue: ref.watch(_corperPrintType),
+                        onChanged: (staff) {
+                          staff != null
+                              ? ref.watch(_corperPrintType.notifier).state =
+                                  'acceptance'
+                              : null;
+                        },
+                        child: const Text("Acceptance Letter")),
+                    RadioMenuButton(
+                        value: 'posting',
+                        groupValue: ref.watch(_corperPrintType),
+                        onChanged: (siwes) {
+                          siwes != null
+                              ? ref.watch(_corperPrintType.notifier).state =
+                                  siwes
+                              : null;
+                        },
+                        child: const Text("Department Posting")),
+                    RadioMenuButton(
+                        value: 'rejection',
+                        groupValue: ref.watch(_corperPrintType),
+                        onChanged: (rejection) {
+                          rejection != null
+                              ? ref.watch(_corperPrintType.notifier).state =
+                                  rejection
+                              : null;
+                        },
+                        child: const Text("Rejection Letter")),
                   ],
-                  onChanged: (selected) => ref
-                      .watch(_selectedGender.notifier)
-                      .state = selected ?? "M"),
-              ElevatedButton(
-                  onPressed: () async {
-                    String? file;
-                    var selected = ref.watch(_corperPrintType);
-                    if (selected == 'acceptance' ||
-                        selected == 'rejection' &&
-                            ref.watch(_selectedType) ==
-                                AddHocStaffType.corper) {
+                ),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: nameController,
+                  validator: (name) {
+                    return name == null
+                        ? null
+                        : name.isNotEmpty
+                            ? null
+                            : "Enter valid name";
+                  },
+                  decoration: InputDecoration(
+                      labelText:
+                          ref.watch(_selectedType) == AddHocStaffType.corper
+                              ? "Enter corper's name"
+                              : 'Enter student name',
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                ),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: statecodeController,
+                  validator: (name) {
+                    return name == null
+                        ? null
+                        : name.isNotEmpty
+                            ? null
+                            : "Enter valid ID";
+                  },
+                  decoration: InputDecoration(
+                      labelText:
+                          ref.watch(_selectedType) == AddHocStaffType.corper
+                              ? "Enter state code"
+                              : "Enter school ID number",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                ),
+                ref.watch(_selectedType) == AddHocStaffType.corper
+                    ? TextFormField(
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        controller: callUpController,
+                        validator: (name) {
+                          return name == null
+                              ? null
+                              : name.isNotEmpty
+                                  ? null
+                                  : "Enter valid Call of number";
+                        },
+                        decoration: InputDecoration(
+                            labelText: "Enter call of number code",
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30))),
+                      )
+                    : const SizedBox(),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: courseController,
+                  validator: (name) {
+                    return name == null
+                        ? null
+                        : name.isNotEmpty
+                            ? null
+                            : "Enter valid course";
+                  },
+                  decoration: InputDecoration(
+                      labelText: "Enter course of study",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                ),
+                TextFormField(
+                  controller: dptController,
+                  decoration: InputDecoration(
+                      labelText: "Enter Department name",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                ),
+                TextFormField(
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  controller: institutionController,
+                  validator: (name) {
+                    return name == null
+                        ? null
+                        : name.isNotEmpty
+                            ? null
+                            : "Enter valid institution name";
+                  },
+                  decoration: InputDecoration(
+                      labelText: "Enter Institution name",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(30))),
+                ),
+                DropdownButtonFormField(
+                    value: ref.watch(_selectedGender),
+                    items: const [
+                      DropdownMenuItem(value: "M", child: Text("Male")),
+                      DropdownMenuItem(value: "F", child: Text("Female")),
+                    ],
+                    onChanged: (selected) => ref
+                        .watch(_selectedGender.notifier)
+                        .state = selected ?? "M"),
+                ElevatedButton(
+                    onPressed: () async {
+                      String? file;
+                      var selected = ref.watch(_corperPrintType);
                       PdfDocument document = PdfDocument();
                       document.pageSettings.orientation =
                           PdfPageOrientation.portrait;
                       document.pageSettings.margins.all = 30;
-                      GetIt.I<PrinterDoc>().generateStatusNysc(
-                          document: document,
-                          person: AddHocStaff()
-                            ..firstname = nameController.text.split(' ')[0]
-                            ..lastname = nameController.text.split(' ')[1]
-                            ..callUpNumber = callUpController.text
-                            ..institutionID = statecodeController.text
-                            ..gender = ref.watch(_selectedGender)
-                            ..courseOfStudy = courseController.text,
-                          type: selected);
+                      var person = AddHocStaff()
+                        ..firstname = nameController.text.split(' ')[0]
+                        ..lastname = nameController.text.split(' ')[1]
+                        ..callUpNumber = callUpController.text
+                        ..institutionID = statecodeController.text
+                        ..staffType = ref.watch(_selectedType)
+                        ..gender = ref.watch(_selectedGender)
+                        ..courseOfStudy = courseController.text;
+                      if (selected == 'acceptance' ||
+                          selected == 'rejection' &&
+                              ref.watch(_selectedType) ==
+                                  AddHocStaffType.corper) {
+                        GetIt.I<PrinterDoc>().generateStatusNysc(
+                            document: document, person: person, type: selected);
 
-                      file = await GetIt.I<PrinterDoc>()
-                          .savePdfDocumentAndGetPath(document);
-                    }
-                    if (file != null) {
-                      final docx = File(file);
-                      await Printing.layoutPdf(
-                          onLayout: (_) => docx.readAsBytes());
-                    }
-                  },
-                  child: const Text("PRINT"))
-            ],
-          )
-        ]));
+                        file = await GetIt.I<PrinterDoc>()
+                            .savePdfDocumentAndGetPath(document);
+                      }
+
+                      if (selected == 'posting') {
+                        var isar = GetIt.I<Isar>();
+                        var dpts = await isar.departments.where().findAll();
+                        var department = dpts
+                            .firstWhere((d) => d.name == dptController.text);
+                        await GetIt.I<PrinterDoc>().generatePosting(
+                            department: department,
+                            from: "FROM",
+                            to: "TO",
+                            document: document,
+                            person: person);
+                      }
+                      if (file != null) {
+                        final docx = File(file);
+                        await Printing.layoutPdf(
+                            onLayout: (_) => docx.readAsBytes());
+                      }
+                    },
+                    child: const Text("PRINT"))
+              ],
+            )
+          ]));
+    }, error: (Object error, StackTrace stackTrace) {
+      return const Center(child: Text("Error"));
+    }, loading: () {
+      return const Scaffold(
+          body: Center(child: CircularProgressIndicator.adaptive()));
+    });
   }
 }
 
@@ -274,6 +309,22 @@ class _ExistingPrint extends ConsumerWidget {
                             onLayout: (_) => docx.readAsBytes());
                       },
                       child: const Text('Rejection\nLetter')),
+                  ElevatedButton(
+                      onPressed: () async {
+                        PdfDocument document = PdfDocument();
+                        document.pageSettings.orientation =
+                            PdfPageOrientation.portrait;
+                        document.pageSettings.margins.all = 30;
+                        await ref
+                            .watch(printHelperProvider.notifier)
+                            .generatePosting(
+                                from: "Sample",
+                                to: "Receiver",
+                                department: person.department!,
+                                person: person,
+                                document: document);
+                      },
+                      child: const Text('Department posting\nLetter')),
                   isCorper
                       ? ElevatedButton(
                           onPressed: () {},
@@ -371,8 +422,3 @@ class _ExistingPrint extends ConsumerWidget {
 // siwes completion
 // department posting
 // monthly clearance
-
-enum _PrintOptions {
-  acceptance,
-  posting,
-}
