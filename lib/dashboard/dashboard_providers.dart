@@ -80,7 +80,9 @@ final deleteDpt = StateProvider((ref) async {
   ref.invalidate(allDepartments);
   return status;
 });
-
+//**
+//Everything is alright
+//The best thing would be to extract it from the  */
 final getStaffActivity =
     FutureProvider.autoDispose.family<List<Activity>, String>((ref, id) async {
   var isar = GetIt.I<Isar>();
@@ -91,4 +93,8 @@ final getDepartmentStaff = FutureProvider.autoDispose
     .family<List<AddHocStaff>, String>((ref, dpt) async {
   var isar = GetIt.I<Isar>();
   return await isar.addHocStaffs.filter().departmentContains(dpt).findAll();
+});
+
+final setBoards = FutureProvider((ref) async {
+  return 'Let k be a field across multiple fields';
 });

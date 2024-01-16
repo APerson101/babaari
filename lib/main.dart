@@ -29,8 +29,13 @@ void main() async {
     if (stack is stack_trace.Chain) return stack.toTrace().vmTrace;
     return stack;
   };
-  GetIt.I.registerSingleton<Isar>(
-      await Isar.open([AddHocStaffSchema, ActivitySchema, DepartmentSchema]));
+  WidgetsFlutterBinding.ensureInitialized();
+  final dir = await getApplicationDocumentsDirectory();
+
+  GetIt.I.registerSingleton<Isar>(await Isar.open(
+    [AddHocStaffSchema, ActivitySchema, DepartmentSchema],
+    directory: dir.path,
+  ));
   GetIt.I.registerSingleton<DatabaseHelper>(DatabaseHelper());
   GetIt.I.registerSingleton<PrinterDoc>(PrinterDoc());
   runApp(ProviderScope(child: MyApp()));
@@ -157,7 +162,7 @@ class MyApp extends ConsumerWidget {
 
         // signer
         element = PdfTextElement(
-            text: 'CHRISTIE IZI (MRS)',
+            text: 'GRACE A. ZACKS (MRS)',
             font: PdfStandardFont(PdfFontFamily.helvetica, 12,
                 style: PdfFontStyle.bold));
         result = element.draw(

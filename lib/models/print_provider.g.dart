@@ -6,41 +6,19 @@ part of 'print_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-// ignore_for_file: avoid_private_typedef_functions, non_constant_identifier_names, subtype_of_sealed_class, invalid_use_of_internal_member, unused_element, constant_identifier_names, unnecessary_raw_strings, library_private_types_in_public_api
-
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-String _$PrintHelperHash() => r'1ecb3fce8a1a2b2b19a5a6a46af3dcdf3c5145f1';
+String _$printHelperHash() => r'4e3938a4865d59e6d6c3021e022cbb50d88445b9';
 
 /// See also [PrintHelper].
-final printHelperProvider = AutoDisposeAsyncNotifierProvider<PrintHelper, void>(
+@ProviderFor(PrintHelper)
+final printHelperProvider =
+    AutoDisposeAsyncNotifierProvider<PrintHelper, void>.internal(
   PrintHelper.new,
   name: r'printHelperProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$PrintHelperHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$printHelperHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
 );
-typedef PrintHelperRef = AutoDisposeAsyncNotifierProviderRef<void>;
 
-abstract class _$PrintHelper extends AutoDisposeAsyncNotifier<void> {
-  @override
-  FutureOr<void> build();
-}
+typedef _$PrintHelper = AutoDisposeAsyncNotifier<void>;
+// ignore_for_file: unnecessary_raw_strings, subtype_of_sealed_class, invalid_use_of_internal_member, do_not_use_environment, prefer_const_constructors, public_member_api_docs, avoid_private_typedef_functions

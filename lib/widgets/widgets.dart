@@ -13,6 +13,9 @@ import 'package:printing/printing.dart';
 
 import '../models/department.dart';
 
+//**
+//Let K be a field ataached across
+//various things that can not be defined */
 class SearchBarWidget extends ConsumerWidget {
   const SearchBarWidget({super.key});
   @override
@@ -260,10 +263,10 @@ class MultiPrintDailogWidget extends ConsumerWidget {
           ]),
       body: Center(
         child: Column(children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
-              children: const [
+              children: [
                 Expanded(child: Divider()),
                 Text("Corpers"),
                 Expanded(child: Divider()),
@@ -316,10 +319,10 @@ class MultiPrintDailogWidget extends ConsumerWidget {
               )),
             );
           }).toList(),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
+          const Padding(
+            padding: EdgeInsets.all(8.0),
             child: Row(
-              children: const [
+              children: [
                 Expanded(child: Divider()),
                 Text("Siwes"),
                 Expanded(child: Divider()),
